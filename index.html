@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CERISE UP — Outil de Tarification</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:         #001F54;
+    --navy-dark:    #001440;
+    --cerise:       #B42150;
+    --cerise-light: #d4366a;
+    --lilac:        #C7A0CB;
+    --lilac-light:  #dcc4df;
+    --pearl:        #F0F1F1;
+    --white:        #ffffff;
+    --ink:          #0d1520;
+    --ink-soft:     rgba(13,21,32,0.58);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--pearl);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cerise), var(--lilac), var(--cerise));
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.6rem 2.5rem;
+    max-width: 1120px;
+    margin: 0 auto;
+    gap: 1.5rem;
+  }
+  .logo-area {
+    width: 160px; height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .header-title { flex: 1; text-align: center; }
+  .header-title h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.85rem; font-weight: 700;
+    color: var(--white); line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .header-title h1 em { font-style: italic; color: var(--lilac); }
+  .header-title .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: rgba(199,160,203,0.55);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+  }
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(180,33,80,0.18);
+    border: 1px solid rgba(180,33,80,0.35);
+    color: var(--lilac);
+    padding: 0.28rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.62rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--cerise);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.35; transform:scale(0.7); }
+  }
+
+  /* ── LAYOUT ── */
+  .main-wrap {
+    padding: 2.2rem 2.5rem 3rem;
+    max-width: 1120px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 375px;
+    gap: 1.8rem;
+    align-items: start;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    background: var(--white);
+    border: 1px solid rgba(0,31,84,0.09);
+    border-radius: 4px;
+    padding: 1.7rem;
+    margin-bottom: 1.1rem;
+    transition: box-shadow 0.2s;
+    animation: slideUp 0.35s ease both;
+  }
+  .section:hover { box-shadow: 4px 4px 0 rgba(0,31,84,0.07); }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .section:nth-child(1){animation-delay:.04s}
+  .section:nth-child(2){animation-delay:.08s}
+  .section:nth-child(3){animation-delay:.12s}
+  .section:nth-child(4){animation-delay:.16s}
+  .section:nth-child(5){animation-delay:.20s}
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cerise);
+    margin-bottom: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(199,160,203,0.3);
+  }
+
+  .sub-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(0,31,84,0.45);
+    margin: 1.1rem 0 0.6rem;
+  }
+
+  /* ── INPUTS ── */
+  .field-group { margin-bottom: 1rem; }
+  label {
+    display: block;
+    font-size: 0.77rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 0.42rem;
+  }
+  input[type="number"],
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(0,31,84,0.14);
+    border-radius: 3px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: var(--pearl);
+    color: var(--ink);
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+  }
+  textarea { resize: vertical; min-height: 70px; line-height: 1.55; }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--navy);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(0,31,84,0.05);
+  }
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+  .input-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.9rem;
+  }
+  .input-with-unit { position: relative; }
+  .input-with-unit input { padding-right: 3.5rem; }
+  .unit {
+    position: absolute;
+    right: 0.9rem; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(0,31,84,0.3);
+    pointer-events: none;
+  }
+
+  /* ── CHECKBOX TOGGLES ── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .toggle-row:hover .toggle-box { border-color: var(--cerise); }
+  .toggle-box {
+    width: 16px; height: 16px;
+    border: 1.5px solid rgba(0,31,84,0.2);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    flex-shrink: 0;
+    transition: all 0.14s;
+  }
+  .toggle-row.checked .toggle-box {
+    background: var(--cerise);
+    border-color: var(--cerise);
+    color: var(--white);
+  }
+  .toggle-label { font-size: 0.82rem; font-weight: 500; }
+  .toggle-desc { font-size: 0.68rem; color: var(--ink-soft); margin-top: 1px; }
+
+  /* ── MULTI-SELECT PILLS (droits) ── */
+  .pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+  }
+  .pill {
+    padding: 0.38rem 0.85rem;
+    border: 1px solid rgba(0,31,84,0.14);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.14s;
+    background: var(--pearl);
+    color: var(--ink-soft);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pill:hover { border-color: var(--cerise); color: var(--ink); }
+  .pill.active { background: var(--navy); border-color: var(--navy); color: var(--pearl); }
+
+  /* ── OPTIONS (section 04) ── */
+  .option-list { display: flex; flex-direction: column; gap: 0.45rem; }
+  .option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid rgba(0,31,84,0.09);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.14s;
+    background: var(--pearl);
+  }
+  .option-item:hover { border-color: var(--cerise); background: var(--white); }
+  .option-item.checked { border-color: var(--navy); background: var(--navy); color: var(--pearl); }
+  .option-left { display: flex; align-items: center; gap: 0.7rem; }
+  .option-name { font-size: 0.82rem; font-weight: 500; }
+  .option-desc { font-size: 0.67rem; opacity: 0.5; margin-top: 1px; }
+  .option-price {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.73rem;
+    color: var(--cerise);
+    flex-shrink: 0;
+  }
+  .option-item.checked .option-price { color: var(--lilac-light); }
+  .check-mark {
+    width: 16px; height: 16px;
+    border: 1.5px solid rgba(0,31,84,0.18);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; flex-shrink: 0;
+  }
+  .option-item.checked .check-mark { background: var(--cerise); border-color: var(--cerise); color: var(--white); }
+
+  /* option with free input for price */
+  .option-item .free-input {
+    width: 90px;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid rgba(199,160,203,0.5);
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    background: rgba(240,241,241,0.5);
+    color: var(--ink);
+    text-align: right;
+  }
+  .option-item.checked .free-input {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(199,160,203,0.4);
+    color: var(--lilac-light);
+  }
+  .option-item .free-input:focus { outline: none; border-color: var(--lilac); }
+
+  /* ── COMPLEXITY ── */
+  .complexity-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 0.55rem;
+  }
+  .complexity-btn {
+    padding: 0.68rem 0.2rem;
+    border: 1px solid rgba(0,31,84,0.11);
+    border-radius: 3px;
+    background: var(--pearl);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.66rem;
+    text-align: center;
+    color: var(--ink-soft);
+    transition: all 0.15s;
+    display: flex; flex-direction: column; align-items: center; gap: 0.38rem;
+  }
+  .complexity-btn .dot-row { display: flex; gap: 3px; }
+  .complexity-btn .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(0,31,84,0.16); }
+  .complexity-btn.active { border-color: var(--navy); background: var(--navy); color: var(--pearl); }
+  .complexity-btn.active .dot { background: var(--lilac); }
+  .complexity-btn:hover:not(.active) { border-color: var(--cerise); color: var(--ink); }
+  .complexity-bar { height: 3px; background: rgba(0,31,84,0.08); border-radius: 2px; overflow: hidden; margin-top: 0.55rem; }
+  .complexity-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--navy), var(--cerise), var(--lilac));
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .complexity-note { font-size: 0.66rem; color: rgba(0,31,84,0.38); margin-top: 0.48rem; font-family: 'DM Mono', monospace; }
+
+  /* ── URGENCY ── */
+  .urgency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
+  .urgency-btn {
+    padding: 0.8rem 0.4rem;
+    border: 1px solid rgba(0,31,84,0.11);
+    border-radius: 3px;
+    background: var(--pearl);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.14s;
+  }
+  .urgency-label { font-size: 0.78rem; font-weight: 500; display: block; }
+  .urgency-mult { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: rgba(0,31,84,0.38); margin-top: 0.2rem; display: block; }
+  .urgency-btn.active { border-color: var(--navy); background: var(--navy); color: var(--pearl); }
+  .urgency-btn.active .urgency-mult { color: var(--lilac); }
+  .urgency-btn.active-cerise { border-color: var(--cerise); background: var(--cerise); color: var(--white); }
+  .urgency-btn.active-cerise .urgency-mult { color: rgba(255,255,255,0.65); }
+  .urgency-btn:hover:not(.active):not(.active-cerise) { border-color: var(--cerise); }
+
+  /* ── DROITS COEFFICIENT ── */
+  .droits-coefficient {
+    background: rgba(0,31,84,0.04);
+    border: 1px solid rgba(0,31,84,0.1);
+    border-radius: 3px;
+    padding: 0.9rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .droits-coefficient .coeff-label { color: var(--ink-soft); font-size: 0.77rem; }
+  .droits-coefficient .coeff-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .droits-info {
+    font-size: 0.7rem;
+    color: rgba(0,31,84,0.45);
+    margin-top: 0.5rem;
+    font-style: italic;
+    line-height: 1.45;
+  }
+
+  /* ── DROITS TABLE ── */
+  .droits-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+  }
+  .droits-table thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(0,31,84,0.45);
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid rgba(0,31,84,0.1);
+  }
+  .droits-table tbody td {
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid rgba(0,31,84,0.05);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .droits-table tbody tr:last-child td { border-bottom: none; }
+  .droits-table tbody tr:hover td { background: rgba(199,160,203,0.07); }
+  .droits-table .td-cat {
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  .droits-table .td-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--cerise);
+    white-space: nowrap;
+  }
+  .droits-table .td-note { color: var(--ink-soft); font-size: 0.72rem; }
+
+  .droits-group-header td {
+    background: rgba(0,31,84,0.04);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cerise);
+    padding: 0.5rem 0.6rem 0.3rem;
+    border-bottom: none !important;
+  }
+
+  /* Sources block */
+  .sources-block {
+    background: rgba(0,31,84,0.03);
+    border: 1px solid rgba(0,31,84,0.08);
+    border-left: 3px solid var(--navy);
+    border-radius: 0 3px 3px 0;
+    padding: 1rem 1.1rem;
+    margin-top: 1.3rem;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .sources-block strong { color: var(--navy); font-weight: 600; display: block; margin-bottom: 0.4rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .sources-block ul { list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
+  .sources-block ul li { display: flex; gap: 0.5rem; align-items: flex-start; }
+  .sources-block ul li::before { content: '›'; color: var(--cerise); flex-shrink: 0; }
+  .sources-block .disclaimer {
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid rgba(0,31,84,0.08);
+    font-style: italic;
+    font-size: 0.7rem;
+    color: rgba(0,31,84,0.4);
+  }
+
+  /* ── QUOTE PANEL ── */
+  .quote-panel { position: sticky; top: 2rem; animation: slideUp 0.35s 0.22s ease both; }
+  .quote-card {
+    background: var(--navy);
+    color: var(--pearl);
+    padding: 2rem;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-card::before {
+    content: '';
+    position: absolute;
+    top: -90px; right: -90px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(199,160,203,0.1) 0%, transparent 68%);
+    pointer-events: none;
+  }
+  .quote-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cerise), var(--lilac));
+  }
+  .quote-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--lilac);
+    margin-bottom: 1.6rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .quote-header::after { content: ''; flex: 1; height: 1px; background: rgba(199,160,203,0.18); }
+  .quote-project {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.92rem;
+    font-style: italic;
+    color: rgba(240,241,241,0.48);
+    margin-bottom: 1.3rem;
+    min-height: 1.3em;
+    word-break: break-word;
+    line-height: 1.4;
+  }
+  .price-display { margin-bottom: 1.7rem; }
+  .price-range-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; opacity: 0.4; margin-bottom: 0.28rem; }
+  .price-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 700;
+    color: var(--white); line-height: 1;
+    letter-spacing: -0.02em;
+    display: flex; align-items: baseline; gap: 0.2rem;
+  }
+  .price-main .euro { font-size: 1.35rem; color: var(--lilac); }
+  .price-range { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: rgba(240,241,241,0.32); margin-top: 0.38rem; }
+
+  .breakdown { border-top: 1px solid rgba(240,241,241,0.07); padding-top: 1.2rem; margin-bottom: 1.2rem; }
+  .breakdown-title { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,241,241,0.28); margin-bottom: 0.85rem; }
+  .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 0.32rem 0; font-size: 0.76rem; }
+  .breakdown-row.total { border-top: 1px solid rgba(240,241,241,0.09); padding-top: 0.7rem; margin-top: 0.3rem; font-weight: 600; color: var(--white); }
+  .breakdown-row.sub { opacity: 0.7; font-size: 0.7rem; padding-left: 0.8rem; }
+  .breakdown-key { opacity: 0.52; }
+  .breakdown-val { font-family: 'DM Mono', monospace; font-size: 0.71rem; color: var(--lilac-light); }
+  .breakdown-row.total .breakdown-val { color: var(--lilac); font-size: 0.85rem; }
+
+  .tva-mention { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: rgba(240,241,241,0.28); margin-top: 0.4rem; font-style: italic; }
+
+  /* maintenance badge in quote */
+  .maintenance-badge {
+    background: rgba(199,160,203,0.12);
+    border: 1px solid rgba(199,160,203,0.2);
+    border-radius: 3px;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--lilac-light);
+    display: none;
+  }
+  .maintenance-badge.visible { display: block; }
+
+  .quote-actions { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1.2rem; }
+  .btn-primary {
+    width: 100%; padding: 0.88rem;
+    background: var(--cerise); color: var(--white);
+    border: none; border-radius: 3px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.86rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: var(--cerise-light); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    width: 100%; padding: 0.78rem;
+    background: transparent; color: var(--pearl);
+    border: 1px solid rgba(240,241,241,0.16);
+    border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  .btn-secondary:hover { border-color: rgba(199,160,203,0.45); }
+
+  .tip-card {
+    background: var(--white);
+    border: 1px solid rgba(0,31,84,0.07);
+    border-left: 3px solid var(--lilac);
+    padding: 0.85rem 1rem;
+    border-radius: 0 3px 3px 0;
+    margin-top: 0.85rem;
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .tip-card strong { color: var(--navy); font-weight: 600; }
+  .tip-card em { font-style: italic; color: var(--ink); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy-dark);
+    color: rgba(240,241,241,0.42);
+    margin-top: 3rem;
+    padding: 2.5rem 2.5rem 2rem;
+    position: relative; z-index: 1;
+  }
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cerise), var(--lilac), var(--cerise));
+  }
+  .footer-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  .footer-copyright { font-family: 'DM Mono', monospace; font-size: 0.66rem; line-height: 1.7; letter-spacing: 0.02em; }
+  .footer-brand { color: var(--lilac); font-size: 1rem; font-family: 'Playfair Display', serif; font-weight: 700; display: block; margin-bottom: 0.5rem; letter-spacing: 0.06em; }
+  .footer-cgu h3 { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cerise); margin-bottom: 0.85rem; }
+  .footer-cgu ul { list-style: none; display: flex; flex-direction: column; gap: 0.32rem; }
+  .footer-cgu ul li { font-family: 'DM Mono', monospace; font-size: 0.63rem; color: rgba(240,241,241,0.38); display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4; }
+  .footer-cgu ul li::before { content: '—'; color: var(--cerise); flex-shrink: 0; }
+  .footer-warning { grid-column: 1 / -1; border-top: 1px solid rgba(180,33,80,0.18); padding-top: 1.2rem; margin-top: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(180,33,80,0.65); line-height: 1.7; letter-spacing: 0.02em; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 840px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .quote-panel { position: static; }
+    .header-title h1 { font-size: 1.35rem; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .footer-warning { grid-column: 1; }
+    .complexity-grid { grid-template-columns: repeat(3, 1fr); }
+    .header-inner, .main-wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .input-row-3 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <img alt="Logo" src="https://d1yei2z3i6k35z.cloudfront.net/13882048/68b9ba238c879_Logo.png" style="display:block;max-width:100%;max-height:100%;object-fit:contain;">
+    </div>
+    <div class="header-title">
+      <h1>Outil de <em>tarification</em></h1>
+      <p class="subtitle">Pour graphiste indépendant · Calcul en temps réel</p>
+    </div>
+    <span class="live-badge"><span class="live-dot"></span>Calcul live</span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <div class="main-grid">
+    <div>
+
+      <!-- ══ 01 DESCRIPTION & CONTEXTE ══ -->
+      <div class="section">
+        <div class="section-label">01 — Description & contexte du projet</div>
+
+        <div class="field-group">
+          <label>Décrivez librement votre projet</label>
+          <textarea id="projectDesc"
+            placeholder="Ex : Création d'une identité visuelle pour une marque de cosmétiques — logo, palette, typographie, déclinaisons print et web."
+            oninput="updateQuoteProject()"></textarea>
+        </div>
+
+        <!-- Déplacement -->
+        <div class="sub-label">Déplacement chez le client</div>
+        <div class="input-row" style="margin-bottom:0.6rem">
+          <div class="field-group" style="margin-bottom:0">
+            <label>Distance aller-retour</label>
+            <div class="input-with-unit">
+              <input type="number" id="kmDistance" value="0" min="0" step="1" oninput="calculate()">
+              <span class="unit">km</span>
+            </div>
+          </div>
+          <div class="field-group" style="margin-bottom:0">
+            <label>Tarif kilométrique</label>
+            <div class="input-with-unit">
+              <input type="number" id="kmRate" value="0.42" min="0" step="0.01" oninput="calculate()">
+              <span class="unit">€/km</span>
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-bottom:0.9rem">
+          <div class="field-group" style="margin-bottom:0">
+            <label>Temps de déplacement</label>
+            <div class="input-with-unit">
+              <input type="number" id="travelHours" value="0" min="0" step="0.5" oninput="calculate()">
+              <span class="unit">h</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:0.1rem;">
+            <small style="font-size:0.7rem;color:var(--ink-soft);line-height:1.4;">Le temps de trajet est facturé au taux horaire défini en section 02.</small>
+          </div>
+        </div>
+
+        <!-- Réunion début de projet -->
+        <div class="sub-label">Réunion de lancement</div>
+        <div class="toggle-row" id="toggleReunion" onclick="toggleCheck('toggleReunion', 0, true); calculate()">
+          <div class="toggle-box">✓</div>
+          <div>
+            <div class="toggle-label">Réunion début de projet (1h)</div>
+            <div class="toggle-desc">Facturée au taux horaire défini en section 02</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ 02 TEMPS DE TRAVAIL ══ -->
+      <div class="section">
+        <div class="section-label">02 — Temps de travail</div>
+        <div class="input-row">
+          <div class="field-group">
+            <label>Taux horaire</label>
+            <div class="input-with-unit">
+              <input type="number" id="hourlyRate" value="70" min="10" max="2000" oninput="calculate()">
+              <span class="unit">€/h</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Heures estimées</label>
+            <div class="input-with-unit">
+              <input type="number" id="hours" value="8" min="0.5" step="0.5" oninput="calculate()">
+              <span class="unit">h</span>
+            </div>
+          </div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label>Révisions incluses</label>
+          <div class="input-with-unit">
+            <input type="number" id="revisions" value="3" min="0" max="20" oninput="calculate()">
+            <span class="unit">tours</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 03 COMPLEXITÉ ══ -->
+      <div class="section">
+        <div class="section-label">03 — Complexité de la demande</div>
+        <div class="complexity-grid">
+          <button class="complexity-btn" onclick="setComplexity(1, this)">
+            <div class="dot-row"><div class="dot"></div></div>
+            <span>Simple ×1</span>
+          </button>
+          <button class="complexity-btn active" onclick="setComplexity(1, this)">
+            <div class="dot-row"><div class="dot"></div><div class="dot"></div></div>
+            <span>Facile ×1</span>
+          </button>
+          <button class="complexity-btn" onclick="setComplexity(1.25, this)">
+            <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <span>Moyen ×1.25</span>
+          </button>
+          <button class="complexity-btn" onclick="setComplexity(1.5, this)">
+            <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <span>Complexe ×1.5</span>
+          </button>
+          <button class="complexity-btn" onclick="setComplexity(2, this)">
+            <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <span>Expert ×2</span>
+          </button>
+        </div>
+        <div class="complexity-bar">
+          <div class="complexity-fill" id="complexityBar" style="width:10%"></div>
+        </div>
+        <p class="complexity-note" id="complexityLabel">Modificateur actuel : ×1</p>
+      </div>
+
+      <!-- ══ 03 LIVRABLES ══ -->
+      <div class="section">
+        <div class="section-label">03 — Livrables</div>
+        <p style="font-size:0.76rem;color:var(--ink-soft);margin-bottom:1rem;line-height:1.5;">Saisissez un montant fixe (€) ou un pourcentage (%) du total. Les deux champs sont indépendants — remplissez l'un ou l'autre.</p>
+        <div class="option-list" id="livrableslist">
+
+          <!-- Benchmark / Moodboard -->
+          <div class="option-item" id="optBenchmark" onclick="toggleLivrable(event,'optBenchmark')">
+            <div class="option-left">
+              <div class="check-mark">✓</div>
+              <div>
+                <div class="option-name">Benchmark / Moodboard</div>
+                <div class="option-desc">Analyse concurrentielle, planche d'inspiration</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+              <input class="free-input" id="benchAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
+              <input class="free-input" id="benchPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
+            </div>
+          </div>
+
+          <!-- Déclinaison réseaux sociaux -->
+          <div class="option-item" id="optReseaux" onclick="toggleLivrable(event,'optReseaux')">
+            <div class="option-left">
+              <div class="check-mark">✓</div>
+              <div>
+                <div class="option-name">Déclinaison réseaux sociaux</div>
+                <div class="option-desc">Formats adaptés Instagram, LinkedIn, Facebook…</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+              <input class="free-input" id="reseauxAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
+              <input class="free-input" id="reseauxPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
+            </div>
+          </div>
+
+          <!-- Suivi d'impression -->
+          <div class="option-item" id="optImpression" onclick="toggleLivrable(event,'optImpression')">
+            <div class="option-left">
+              <div class="check-mark">✓</div>
+              <div>
+                <div class="option-name">Suivi d'impression</div>
+                <div class="option-desc">Coordination imprimeur, BAT</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+              <input class="free-input" id="suiviAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
+              <input class="free-input" id="suiviPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
+            </div>
+          </div>
+
+          <!-- Fichiers sources -->
+          <div class="option-item" id="optSources" onclick="toggleLivrable(event,'optSources')">
+            <div class="option-left">
+              <div class="check-mark">✓</div>
+              <div>
+                <div class="option-name">Fichiers sources livrés</div>
+                <div class="option-desc">AI, PSD, Figma, formats éditables</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+              <input class="free-input" id="sourcesAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
+              <input class="free-input" id="sourcesPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
+            </div>
+          </div>
+
+          <!-- Maintenance mensuelle -->
+          <div class="option-item" id="optMaintenance" onclick="toggleLivrable(event,'optMaintenance')">
+            <div class="option-left">
+              <div class="check-mark">✓</div>
+              <div>
+                <div class="option-name">Maintenance mensuelle</div>
+                <div class="option-desc">Mises à jour, ajustements, suivi régulier</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+              <input class="free-input" id="maintenanceAmt" type="number" value="" min="0" placeholder="€/mois" onclick="event.stopPropagation()" oninput="updateMaintenanceBadge()" style="width:90px">
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ 05 URGENCE ══ -->
+      <div class="section">
+        <div class="section-label">05 — Délai & urgence</div>
+        <div class="urgency-grid">
+          <button class="urgency-btn" onclick="setUrgency(0.9, this)">
+            <span class="urgency-label">Flexible</span>
+            <span class="urgency-mult">−10%</span>
+          </button>
+          <button class="urgency-btn active" onclick="setUrgency(1, this)">
+            <span class="urgency-label">Standard</span>
+            <span class="urgency-mult">×1</span>
+          </button>
+          <button class="urgency-btn" onclick="setUrgency(1.35, this, 'cerise')">
+            <span class="urgency-label">Urgent</span>
+            <span class="urgency-mult">+35%</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ 06 DROITS D'AUTEUR & UTILISATION ══ -->
+      <div class="section">
+        <div class="section-label">06 — Droits d'auteur & utilisation des créations</div>
+
+        <p style="font-size:0.8rem;color:var(--ink-soft);line-height:1.6;margin-bottom:1.2rem;">
+          En droit français, la <strong style="color:var(--navy)">cession de droits d'auteur</strong> se facture séparément des honoraires de création (art. L.131-3 du Code de la Propriété Intellectuelle). Elle doit être précisée selon trois critères : le <em>type d'utilisation</em>, les <em>supports de diffusion</em>, la <em>durée</em> et le <em>territoire</em>.
+        </p>
+
+        <div class="field-group">
+          <label>Type d'utilisation</label>
+          <div class="pill-group" id="pillUsage">
+            <span class="pill" data-coeff="0.10" onclick="togglePill(this)">Commercial <em>+10%</em></span>
+            <span class="pill" data-coeff="0.08" onclick="togglePill(this)">Éditorial <em>+8%</em></span>
+            <span class="pill" data-coeff="0.12" onclick="togglePill(this)">Logo / Identité visuelle <em>+12%</em></span>
+            <span class="pill" data-coeff="0.07" onclick="togglePill(this)">Illustration pédagogique <em>+7%</em></span>
+            <span class="pill" data-coeff="0.15" onclick="togglePill(this)">Motifs sur supports multiples <em>+15%</em></span>
+            <span class="pill" data-coeff="0.06" onclick="togglePill(this)">Usage interne <em>+6%</em></span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Supports de diffusion</label>
+          <div class="pill-group" id="pillSupports">
+            <span class="pill" data-coeff="0.05" onclick="togglePill(this)">Web / Digital</span>
+            <span class="pill" data-coeff="0.08" onclick="togglePill(this)">Print / Presse</span>
+            <span class="pill" data-coeff="0.10" onclick="togglePill(this)">Textile / Packaging</span>
+            <span class="pill" data-coeff="0.07" onclick="togglePill(this)">Signalétique</span>
+            <span class="pill" data-coeff="0.09" onclick="togglePill(this)">Publicité / Affichage</span>
+            <span class="pill" data-coeff="0.12" onclick="togglePill(this)">Tous supports</span>
+          </div>
+        </div>
+
+        <div class="input-row" style="margin-bottom:1rem">
+          <div class="field-group" style="margin-bottom:0">
+            <label>Durée de cession</label>
+            <select id="cessionDuree" onchange="calculate()">
+              <option value="0.05">1 an</option>
+              <option value="0.10">3 ans</option>
+              <option value="0.15" selected>5 ans</option>
+              <option value="0.25">10 ans</option>
+              <option value="0.40">Illimité</option>
+            </select>
+          </div>
+          <div class="field-group" style="margin-bottom:0">
+            <label>Territoire</label>
+            <select id="cessionTerritoire" onchange="calculate()">
+              <option value="0.00" selected>France</option>
+              <option value="0.05">Europe</option>
+              <option value="0.12">Monde</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="droits-coefficient">
+          <div>
+            <div class="coeff-label">Montant de cession calculé</div>
+            <div style="font-size:0.67rem;color:rgba(0,31,84,0.38);margin-top:2px;">Appliqué sur le total des honoraires</div>
+          </div>
+          <div class="coeff-value" id="droitsCoeff">+0,00&nbsp;€</div>
+        </div>
+
+        <!-- TABLEAU DÉTAIL DES % -->
+        <div class="sub-label" style="margin-top:1.5rem">Détail des pourcentages appliqués</div>
+
+        <table class="droits-table">
+          <thead>
+            <tr>
+              <th>Critère</th>
+              <th>%</th>
+              <th>Justification</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="droits-group-header"><td colspan="3">Type d'utilisation</td></tr>
+            <tr>
+              <td class="td-cat">Commercial</td>
+              <td class="td-pct">+10%</td>
+              <td class="td-note">Utilisation à des fins lucratives directes (vente, promotion de produits/services)</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Éditorial</td>
+              <td class="td-pct">+8%</td>
+              <td class="td-note">Publication dans presse, magazines, livres — diffusion limitée à un titre ou support</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Logo / Identité visuelle</td>
+              <td class="td-pct">+12%</td>
+              <td class="td-note">Usage exclusif et récurrent — représente l'entreprise sur tous ses supports</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Illustration pédagogique</td>
+              <td class="td-pct">+7%</td>
+              <td class="td-note">Usage non commercial, éducatif ou associatif, diffusion restreinte</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Motifs sur supports multiples</td>
+              <td class="td-pct">+15%</td>
+              <td class="td-note">Déclinaison sur textile, packaging, merchandising — exploitation large et répétée</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Usage interne</td>
+              <td class="td-pct">+6%</td>
+              <td class="td-note">Présentation interne, intranet, usage non public — diffusion très restreinte</td>
+            </tr>
+
+            <tr class="droits-group-header"><td colspan="3">Supports de diffusion</td></tr>
+            <tr>
+              <td class="td-cat">Web / Digital</td>
+              <td class="td-pct">+5%</td>
+              <td class="td-note">Site, réseaux sociaux, newsletter — audience potentiellement large mais dématérialisée</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Print / Presse</td>
+              <td class="td-pct">+8%</td>
+              <td class="td-note">Impression papier, tirage défini — support physique implique une valorisation plus élevée</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Textile / Packaging</td>
+              <td class="td-pct">+10%</td>
+              <td class="td-note">Reproduction sur produits physiques vendus — lien direct à la valeur commerciale du produit</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Signalétique</td>
+              <td class="td-pct">+7%</td>
+              <td class="td-note">Affichage fixe (vitrine, enseigne, PLV) — durée d'exposition longue</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Publicité / Affichage</td>
+              <td class="td-pct">+9%</td>
+              <td class="td-note">Campagne publicitaire, affichage grand format — forte visibilité et impact commercial</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Tous supports</td>
+              <td class="td-pct">+12%</td>
+              <td class="td-note">Cession sans restriction de support — majoration pour l'étendue illimitée de diffusion</td>
+            </tr>
+
+            <tr class="droits-group-header"><td colspan="3">Durée de cession</td></tr>
+            <tr>
+              <td class="td-cat">1 an</td>
+              <td class="td-pct">+5%</td>
+              <td class="td-note">Cession temporaire courte — droits réversibles rapidement</td>
+            </tr>
+            <tr>
+              <td class="td-cat">3 ans</td>
+              <td class="td-pct">+10%</td>
+              <td class="td-note">Durée moyenne correspondant à un cycle de communication</td>
+            </tr>
+            <tr>
+              <td class="td-cat">5 ans</td>
+              <td class="td-pct">+15%</td>
+              <td class="td-note">Durée standard recommandée par le SNG et l'UNPI</td>
+            </tr>
+            <tr>
+              <td class="td-cat">10 ans</td>
+              <td class="td-pct">+25%</td>
+              <td class="td-note">Engagement long terme — forte immobilisation des droits</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Illimité</td>
+              <td class="td-pct">+40%</td>
+              <td class="td-note">Cession totale et définitive — équivalent d'une cession de propriété</td>
+            </tr>
+
+            <tr class="droits-group-header"><td colspan="3">Territoire</td></tr>
+            <tr>
+              <td class="td-cat">France</td>
+              <td class="td-pct">+0%</td>
+              <td class="td-note">Marché domestique — base de référence, pas de majoration</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Europe</td>
+              <td class="td-pct">+5%</td>
+              <td class="td-note">Diffusion dans l'espace européen — audience multipliée</td>
+            </tr>
+            <tr>
+              <td class="td-cat">Monde</td>
+              <td class="td-pct">+12%</td>
+              <td class="td-note">Cession mondiale sans restriction géographique — usage potentiellement universel</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- SOURCES -->
+        <div class="sources-block">
+          <strong>Sources & références</strong>
+          <ul>
+            <li>Code de la Propriété Intellectuelle — art. L.121-1, L.131-3, L.335-1 et suivants (droit moral, cession, contrefaçon)</li>
+            <li>Syndicat National des Graphistes (SNG) — guide tarifaire et bonnes pratiques professionnelles</li>
+            <li>UNPI (Union Nationale des Peintres-Illustrateurs) — barème de référence pour la cession de droits d'illustration</li>
+            <li>ADAGP (Société des auteurs dans les arts graphiques et plastiques) — grilles tarifaires pour la reproduction d'œuvres</li>
+            <li>Maison des Artistes — guide pratique du graphiste indépendant</li>
+            <li><em>Tarifer son travail de graphiste</em>, publication du collectif Libre Objet (2021)</li>
+          </ul>
+          <div class="disclaimer">
+            Ces pourcentages sont des valeurs indicatives construites à partir des pratiques professionnelles reconnues en France. Il n'existe pas de barème légal obligatoire. Chaque graphiste reste libre de les adapter selon son secteur, son positionnement et sa clientèle. En cas de doute, une consultation auprès du SNG ou d'un avocat spécialisé en droit de la propriété intellectuelle est recommandée.
+          </div>
+        </div>
+
+      </div><!-- /section 06 -->
+
+    <!-- ══ PANNEAU DEVIS ══ -->
+    <div class="quote-panel">
+      <div class="quote-card">
+        <div class="quote-header">Devis estimatif — CERISE UP</div>
+        <div class="quote-project" id="quoteProject">Description du projet…</div>
+
+        <div class="price-display">
+          <div class="price-range-label">Prix recommandé</div>
+          <div class="price-main">
+            <span id="priceMid">—</span><span class="euro">€</span>
+          </div>
+          <div class="price-range" id="priceRange">Fourchette : — à —</div>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-title">Détail du calcul</div>
+          <div class="breakdown-row">
+            <span class="breakdown-key">Temps (taux × heures)</span>
+            <span class="breakdown-val" id="bdTime">—</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-key">Complexité (×<span id="bdComplexMult">1.45</span>)</span>
+            <span class="breakdown-val" id="bdComplex">—</span>
+          </div>
+          <div class="breakdown-row" id="rowDeplacemement" style="display:none">
+            <span class="breakdown-key">Déplacement + temps trajet</span>
+            <span class="breakdown-val" id="bdDeplacement">—</span>
+          </div>
+          <div class="breakdown-row" id="rowReunion" style="display:none">
+            <span class="breakdown-key">Réunion de lancement</span>
+            <span class="breakdown-val" id="bdReunion">—</span>
+          </div>
+          <div class="breakdown-row" id="rowBrief" style="display:none">
+            <span class="breakdown-key">Brief & consultation</span>
+            <span class="breakdown-val" id="bdBrief">—</span>
+          </div>
+          <div class="breakdown-row" id="rowBenchmark" style="display:none">
+            <span class="breakdown-key">Benchmark / Moodboard</span>
+            <span class="breakdown-val" id="bdBenchmark">—</span>
+          </div>
+          <div class="breakdown-row" id="rowSources" style="display:none">
+            <span class="breakdown-key">Fichiers sources</span>
+            <span class="breakdown-val" id="bdSources">—</span>
+          </div>
+          <div class="breakdown-row" id="rowPng" style="display:none">
+            <span class="breakdown-key">Éléments visuels .png</span>
+            <span class="breakdown-val" id="bdPng">—</span>
+          </div>
+          <div class="breakdown-row" id="rowReseaux" style="display:none">
+            <span class="breakdown-key">Déclinaison réseaux sociaux</span>
+            <span class="breakdown-val" id="bdReseaux">—</span>
+          </div>
+          <div class="breakdown-row" id="rowComm" style="display:none">
+            <span class="breakdown-key">Communication / Identité</span>
+            <span class="breakdown-val" id="bdComm">—</span>
+          </div>
+          <div class="breakdown-row" id="rowSuivi" style="display:none">
+            <span class="breakdown-key">Suivi d'impression (10%)</span>
+            <span class="breakdown-val" id="bdSuivi">—</span>
+          </div>
+          <div class="breakdown-row" id="rowDroits" style="display:none">
+            <span class="breakdown-key">Droits d'auteur / cession</span>
+            <span class="breakdown-val" id="bdDroits">—</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-key">Urgence</span>
+            <span class="breakdown-val" id="bdUrgency">—</span>
+          </div>
+          <div class="breakdown-row total">
+            <span class="breakdown-key">Total estimé</span>
+            <span class="breakdown-val" id="bdTotal">—</span>
+          </div>
+        </div>
+
+        <div class="maintenance-badge" id="maintenanceBadge">
+          Maintenance mensuelle : <span id="maintenanceDisplay">—</span>
+        </div>
+
+        <div class="tva-mention">TVA non applicable, art. 293 B du CGI</div>
+
+        <div class="quote-actions">
+          <button class="btn-primary" id="copyBtn" onclick="copyQuote()">Copier le devis</button>
+          <button class="btn-secondary" onclick="window.print()">Imprimer / PDF</button>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <strong>Franchise en base de TVA :</strong> En micro-entreprise, aucune TVA n'est à collecter. Indiquez sur chaque facture : <em>« TVA non applicable, art. 293 B du CGI »</em>.
+      </div>
+    </div>
+
+  </div><!-- /main-grid -->
+</div><!-- /main-wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      <span class="footer-brand">© EURL Lise-Marie BOURGEOIS — CERISE UP</span>
+      Copyright &copy; 2025 — Tous droits réservés.<br>
+      Cet outil est la propriété exclusive de l'EURL Lise-Marie BOURGEOIS — CERISE UP.<br>
+      Toute utilisation est soumise aux conditions strictes ci-contre.
+    </div>
+    <div class="footer-cgu">
+      <h3>Conditions d'utilisation strictes</h3>
+      <ul>
+        <li>Reproduction totale ou partielle interdite</li>
+        <li>Distribution à des tiers strictement interdite</li>
+        <li>Modification ou adaptation de l'outil interdite</li>
+        <li>Revente sous quelque forme que ce soit interdite</li>
+        <li>Utilisation commerciale par des tiers interdite</li>
+      </ul>
+    </div>
+    <div class="footer-warning">
+      Toute violation des présentes conditions d'utilisation exposera son auteur à des poursuites judiciaires civiles et/ou pénales, conformément aux dispositions du Code de la propriété intellectuelle (art. L.335-1 et suivants) et du Code civil. L'EURL Lise-Marie BOURGEOIS — CERISE UP se réserve le droit d'engager toute action en justice afin de faire valoir ses droits et d'obtenir réparation intégrale du préjudice subi.
+    </div>
+  </div>
+</footer>
+
+<script>
+  let state = {
+    hourlyRate:     65,
+    hours:          8,
+    revisions:      2,
+    complexityMult: 1.45,
+    options:        0,
+    suiviImpression: false,
+    urgencyMult:    1,
+  };
+
+  /* ── HELPERS ── */
+  function fmt(n) {
+    return n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0€';
+  }
+
+  /* ── DESCRIPTION ── */
+  function updateQuoteProject() {
+    const v = document.getElementById('projectDesc').value.trim();
+    document.getElementById('quoteProject').textContent = v || 'Description du projet…';
+  }
+
+  /* ── COMPLEXITY ── */
+  function setComplexity(mult, btn) {
+    document.querySelectorAll('.complexity-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.complexityMult = mult;
+    const pct = ((mult - 1) / (2.2 - 1)) * 100;
+    document.getElementById('complexityBar').style.width = Math.min(100, Math.max(4, pct)) + '%';
+    document.getElementById('complexityLabel').textContent = `Modificateur actuel : ×${mult}`;
+    document.getElementById('bdComplexMult').textContent = mult;
+    calculate();
+  }
+
+  /* ── URGENCY ── */
+  function setUrgency(mult, btn, color) {
+    document.querySelectorAll('.urgency-btn').forEach(b => b.classList.remove('active', 'active-cerise'));
+    btn.classList.add(color === 'cerise' ? 'active-cerise' : 'active');
+    state.urgencyMult = mult;
+    calculate();
+  }
+
+  /* ── SIMPLE OPTION TOGGLE ── */
+  function toggleOption(el, price) {
+    if (el.classList.contains('checked')) {
+      el.classList.remove('checked');
+      state.options -= price;
+    } else {
+      el.classList.add('checked');
+      state.options += price;
+    }
+    calculate();
+  }
+
+  /* ── FREE PRICE OPTION ── */
+  function toggleOptionFree(e, itemId, inputId) {
+    const el = document.getElementById(itemId);
+    el.classList.toggle('checked');
+    calculate();
+  }
+
+  /* ── SUIVI IMPRESSION (10% du total honoraires) ── */
+  function toggleSuiviImpression(el) {
+    el.classList.toggle('checked');
+    state.suiviImpression = el.classList.contains('checked');
+    calculate();
+  }
+
+  /* ── MAINTENANCE ── */
+  function toggleMaintenance(el) {
+    el.classList.toggle('checked');
+    updateMaintenanceBadge();
+  }
+
+  function updateMaintenanceBadge() {
+    const el = document.getElementById('optMaintenance');
+    const val = parseFloat(document.getElementById('inputMaintenance').value) || 0;
+    const badge = document.getElementById('maintenanceBadge');
+    const display = document.getElementById('maintenanceDisplay');
+    if (el.classList.contains('checked') && val > 0) {
+      badge.classList.add('visible');
+      display.textContent = fmt(val) + '/mois';
+    } else {
+      badge.classList.remove('visible');
+    }
+  }
+
+  /* ── TOGGLE ROW (réunion) ── */
+  function toggleCheck(id) {
+    document.getElementById(id).classList.toggle('checked');
+    calculate();
+  }
+
+  /* ── PILLS (droits) ── */
+  function togglePill(pill) {
+    pill.classList.toggle('active');
+    calculate();
+  }
+
+  function getDroitsCoeff() {
+    let coeff = 0;
+    document.querySelectorAll('#pillUsage .pill.active').forEach(p => coeff += parseFloat(p.dataset.coeff));
+    document.querySelectorAll('#pillSupports .pill.active').forEach(p => coeff += parseFloat(p.dataset.coeff));
+    coeff += parseFloat(document.getElementById('cessionDuree').value);
+    coeff += parseFloat(document.getElementById('cessionTerritoire').value);
+    return coeff;
+  }
+
+  /* ── MAIN CALCULATE ── */
+  function calculate() {
+    state.hourlyRate   = parseFloat(document.getElementById('hourlyRate').value) || 65;
+    state.hours        = parseFloat(document.getElementById('hours').value)      || 8;
+    state.revisions    = parseInt(document.getElementById('revisions').value)    || 2;
+
+    // Temps de base
+    const timeBase     = state.hourlyRate * state.hours;
+    const afterComplex = timeBase * state.complexityMult;
+
+    // Déplacement
+    const km           = parseFloat(document.getElementById('kmDistance').value) || 0;
+    const kmRate       = parseFloat(document.getElementById('kmRate').value)      || 0.42;
+    const travelH      = parseFloat(document.getElementById('travelHours').value) || 0;
+    const deplacement  = (km * kmRate) + (travelH * state.hourlyRate);
+
+    // Réunion
+    const reunionOn    = document.getElementById('toggleReunion').classList.contains('checked');
+    const reunion      = reunionOn ? state.hourlyRate * 1 : 0;
+
+    // Options fixes
+    let optionsTotal   = state.options;
+
+    // Fichiers sources (prix libre)
+    if (document.getElementById('optSources').classList.contains('checked')) {
+      optionsTotal += parseFloat(document.getElementById('inputSources').value) || 0;
+    }
+
+    // Sous-total avant impression
+    let subtotal = afterComplex + deplacement + reunion + optionsTotal;
+
+    // Suivi impression : 10% du subtotal
+    let suiviVal = 0;
+    if (state.suiviImpression) {
+      suiviVal = subtotal * 0.10;
+      document.getElementById('priceSuivi').textContent = '+' + fmt(suiviVal);
+    } else {
+      document.getElementById('priceSuivi').textContent = '10% du total';
+    }
+    subtotal += suiviVal;
+
+    // Droits d'auteur
+    const droitsCoeff  = getDroitsCoeff();
+    const droitsAmount = subtotal * droitsCoeff;
+
+    // Total avant urgence
+    const withDroits   = subtotal + droitsAmount;
+    const total        = withDroits * state.urgencyMult;
+    const low          = total * 0.85;
+    const high         = total * 1.15;
+
+    /* ── AFFICHAGE PRIX ── */
+    document.getElementById('priceMid').textContent =
+      total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+    document.getElementById('priceRange').textContent =
+      `Fourchette\u00a0: ${fmt(low)} à ${fmt(high)}`;
+
+    /* ── DÉTAIL ── */
+    document.getElementById('bdTime').textContent    = fmt(timeBase);
+    document.getElementById('bdComplex').textContent = fmt(afterComplex - timeBase);
+
+    // Déplacement row
+    if (deplacement > 0) {
+      document.getElementById('rowDeplacemement').style.display = 'flex';
+      document.getElementById('bdDeplacement').textContent = fmt(deplacement);
+    } else {
+      document.getElementById('rowDeplacemement').style.display = 'none';
+    }
+
+    // Réunion row
+    if (reunion > 0) {
+      document.getElementById('rowReunion').style.display = 'flex';
+      document.getElementById('bdReunion').textContent = fmt(reunion);
+    } else {
+      document.getElementById('rowReunion').style.display = 'none';
+    }
+
+    // Détail options individuelles
+    function showRow(rowId, valId, val) {
+      if (val > 0) {
+        document.getElementById(rowId).style.display = 'flex';
+        document.getElementById(valId).textContent = '+\u00a0' + fmt(val);
+      } else {
+        document.getElementById(rowId).style.display = 'none';
+      }
+    }
+
+    const briefOn     = document.querySelectorAll('.option-list .option-item')[0].classList.contains('checked');
+    const benchOn     = document.querySelectorAll('.option-list .option-item')[1].classList.contains('checked');
+    const sourcesOn   = document.getElementById('optSources').classList.contains('checked');
+    const pngOn       = document.querySelectorAll('.option-list .option-item')[3].classList.contains('checked');
+    const reseauxOn   = document.querySelectorAll('.option-list .option-item')[4].classList.contains('checked');
+    const commOn      = document.querySelectorAll('.option-list .option-item')[5].classList.contains('checked');
+
+    const sourcesVal  = sourcesOn ? (parseFloat(document.getElementById('inputSources').value) || 0) : 0;
+
+    showRow('rowBrief',    'bdBrief',    briefOn   ? 150 : 0);
+    showRow('rowBenchmark','bdBenchmark',benchOn   ? 180 : 0);
+    showRow('rowSources',  'bdSources',  sourcesVal);
+    showRow('rowPng',      'bdPng',      pngOn     ? 120 : 0);
+    showRow('rowReseaux',  'bdReseaux',  reseauxOn ? 90  : 0);
+    showRow('rowComm',     'bdComm',     commOn    ? 110 : 0);
+    showRow('rowSuivi',    'bdSuivi',    suiviVal);
+
+    // Droits row
+    if (droitsAmount > 0) {
+      document.getElementById('rowDroits').style.display = 'flex';
+      document.getElementById('bdDroits').textContent = '+\u00a0' + fmt(droitsAmount);
+      document.getElementById('droitsCoeff').textContent = '+\u00a0' + fmt(droitsAmount);
+    } else {
+      document.getElementById('rowDroits').style.display = 'none';
+      document.getElementById('droitsCoeff').textContent = '+0,00\u00a0€';
+    }
+
+    const urgDiff = total - withDroits;
+    document.getElementById('bdUrgency').textContent =
+      urgDiff !== 0
+        ? (urgDiff > 0 ? '+\u00a0' : '−\u00a0') + fmt(Math.abs(urgDiff))
+        : '—';
+
+    document.getElementById('bdTotal').textContent = fmt(total);
+
+    updateMaintenanceBadge();
+  }
+
+  /* ── COPY ── */
+  function copyQuote() {
+    const desc  = document.getElementById('projectDesc').value.trim() || '(non précisé)';
+    const maint = parseFloat(document.getElementById('inputMaintenance').value) || 0;
+    const maintLine = (document.getElementById('optMaintenance').classList.contains('checked') && maint > 0)
+      ? `\n  Maintenance mensuelle : ${fmt(maint)}/mois` : '';
+
+    const lines = [
+      '─── Devis CERISE UP ───',
+      `Projet : ${desc}`,
+      '',
+      `Prix recommandé : ${document.getElementById('priceMid').textContent} €`,
+      document.getElementById('priceRange').textContent,
+      '',
+      'Détail :',
+      `  Temps de travail        : ${document.getElementById('bdTime').textContent}`,
+      `  Complexité              : ${document.getElementById('bdComplex').textContent}`,
+      `  Options & prestations   : ${document.getElementById('bdOptions').textContent}`,
+      `  Droits d\'auteur / cession : ${document.getElementById('bdDroits') ? document.getElementById('bdDroits').textContent : '—'}`,
+      `  Urgence                 : ${document.getElementById('bdUrgency').textContent}`,
+      `  Total estimé            : ${document.getElementById('bdTotal').textContent}`,
+      maintLine,
+      '',
+      'TVA non applicable, art. 293 B du CGI',
+      '© EURL Lise-Marie BOURGEOIS — CERISE UP 2025 — Tous droits réservés',
+    ].filter(l => l !== '');
+
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copié !';
+      setTimeout(() => btn.textContent = 'Copier le devis', 2200);
+    });
+  }
+
+  /* ── INIT ── */
+  calculate();
+</script>
+</body>
+</html>
