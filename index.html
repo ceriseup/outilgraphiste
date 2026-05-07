@@ -3,1188 +3,603 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CERISE UP — Outil de Tarification</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>GraphiQuote — Outil de tarification graphiste</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy:         #001F54;
-    --navy-dark:    #001440;
-    --cerise:       #B42150;
-    --cerise-light: #d4366a;
-    --lilac:        #C7A0CB;
-    --lilac-light:  #dcc4df;
-    --pearl:        #F0F1F1;
-    --white:        #ffffff;
-    --ink:          #0d1520;
-    --ink-soft:     rgba(13,21,32,0.58);
-  }
+:root {
+  --navy:      #001F54;
+  --navy-dk:   #001440;
+  --cerise:    #B42150;
+  --cerise-l:  #d4366a;
+  --lilac:     #C7A0CB;
+  --lilac-l:   #dcc4df;
+  --pearl:     #F0F1F1;
+  --white:     #ffffff;
+  --ink:       #0d1520;
+  --muted:     rgba(13,21,32,.55);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--pearl);color:var(--ink);min-height:100vh}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* HEADER */
+header{background:var(--navy);border-bottom:3px solid var(--cerise)}
+.hd{max-width:1400px;margin:0 auto;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.logo-wrap{width:150px;height:70px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.logo-wrap img{max-width:100%;max-height:100%;object-fit:contain}
+.hd-title{flex:1;text-align:center}
+.hd-title h1{font-family:'DM Sans',sans-serif;font-size:2.4rem;font-weight:700;color:#fff;letter-spacing:-.03em}
+.hd-title h1 em{font-style:normal;color:var(--lilac);font-weight:300}
+.hd-title p{font-family:'DM Mono',monospace;font-size:.62rem;color:rgba(199,160,203,.55);letter-spacing:.14em;text-transform:uppercase;margin-top:.3rem}
+.badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(180,33,80,.18);border:1px solid rgba(180,33,80,.35);color:var(--lilac);padding:.28rem .75rem;border-radius:20px;font-size:.62rem;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+.dot{width:6px;height:6px;background:var(--cerise);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--pearl);
-    color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* LAYOUT */
+.wrap{max-width:1400px;margin:0 auto;padding:2rem 2.5rem 3rem;display:grid;grid-template-columns:1fr 460px;gap:2rem;align-items:start}
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
+/* SECTIONS */
+.sec{background:#fff;border:1px solid rgba(0,31,84,.09);border-radius:4px;padding:1.6rem;margin-bottom:1rem}
+.sec:hover{box-shadow:4px 4px 0 rgba(0,31,84,.07)}
+.sec-lbl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cerise);margin-bottom:1.1rem;display:flex;align-items:center;gap:.6rem}
+.sec-lbl::after{content:'';flex:1;height:1px;background:rgba(199,160,203,.3)}
+.sub-lbl{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,31,84,.45);margin:1rem 0 .55rem}
 
-  /* ── HEADER ── */
-  header {
-    background: var(--navy);
-    position: relative;
-    overflow: hidden;
-  }
-  header::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--cerise), var(--lilac), var(--cerise));
-  }
-  .header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.6rem 2.5rem;
-    max-width: 1120px;
-    margin: 0 auto;
-    gap: 1.5rem;
-  }
-  .logo-area {
-    width: 160px; height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-  .header-title { flex: 1; text-align: center; }
-  .header-title h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.85rem; font-weight: 700;
-    color: var(--white); line-height: 1.1;
-    letter-spacing: -0.01em;
-  }
-  .header-title h1 em { font-style: italic; color: var(--lilac); }
-  .header-title .subtitle {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    color: rgba(199,160,203,0.55);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-top: 0.4rem;
-  }
-  .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: rgba(180,33,80,0.18);
-    border: 1px solid rgba(180,33,80,0.35);
-    color: var(--lilac);
-    padding: 0.28rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.62rem;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  .live-dot {
-    width: 6px; height: 6px;
-    background: var(--cerise);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50% { opacity:0.35; transform:scale(0.7); }
-  }
+/* INPUTS */
+.fld{margin-bottom:.9rem}
+label{display:block;font-size:.76rem;font-weight:500;color:var(--muted);margin-bottom:.38rem}
+input[type=number],input[type=text],textarea,select{width:100%;padding:.65rem .9rem;border:1px solid rgba(0,31,84,.14);border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:var(--pearl);color:var(--ink);transition:border-color .2s,background .2s;appearance:none}
+textarea{resize:vertical;min-height:68px;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(0,31,84,.05)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem}
+.iu{position:relative}
+.iu input{padding-right:3.2rem}
+.iu-lbl{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:.68rem;color:rgba(0,31,84,.3);pointer-events:none}
 
-  /* ── LAYOUT ── */
-  .main-wrap {
-    padding: 2.2rem 2.5rem 3rem;
-    max-width: 1120px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 375px;
-    gap: 1.8rem;
-    align-items: start;
-  }
+/* TOGGLE ROW */
+.tgl{display:flex;align-items:center;gap:.7rem;padding:.45rem 0;cursor:pointer}
+.tgl:hover .tbox{border-color:var(--cerise)}
+.tbox{width:16px;height:16px;border:1.5px solid rgba(0,31,84,.2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;transition:all .14s}
+.tgl.on .tbox{background:var(--cerise);border-color:var(--cerise);color:#fff}
+.tgl-name{font-size:.82rem;font-weight:500}
+.tgl-desc{font-size:.68rem;color:var(--muted);margin-top:1px}
 
-  /* ── SECTIONS ── */
-  .section {
-    background: var(--white);
-    border: 1px solid rgba(0,31,84,0.09);
-    border-radius: 4px;
-    padding: 1.7rem;
-    margin-bottom: 1.1rem;
-    transition: box-shadow 0.2s;
-    animation: slideUp 0.35s ease both;
-  }
-  .section:hover { box-shadow: 4px 4px 0 rgba(0,31,84,0.07); }
-  @keyframes slideUp {
-    from { opacity:0; transform:translateY(12px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-  .section:nth-child(1){animation-delay:.04s}
-  .section:nth-child(2){animation-delay:.08s}
-  .section:nth-child(3){animation-delay:.12s}
-  .section:nth-child(4){animation-delay:.16s}
-  .section:nth-child(5){animation-delay:.20s}
+/* COMPLEXITY */
+.cplx-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.5rem}
+.cplx-btn{padding:.65rem .2rem;border:1px solid rgba(0,31,84,.11);border-radius:3px;background:var(--pearl);cursor:pointer;font-family:'DM Mono',monospace;font-size:.63rem;text-align:center;color:var(--muted);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:.35rem}
+.cplx-btn .dr{display:flex;gap:3px}
+.cplx-btn .d{width:5px;height:5px;border-radius:50%;background:rgba(0,31,84,.16)}
+.cplx-btn.on{border-color:var(--navy);background:var(--navy);color:var(--pearl)}
+.cplx-btn.on .d{background:var(--lilac)}
+.cplx-btn:hover:not(.on){border-color:var(--cerise);color:var(--ink)}
+.cplx-bar{height:3px;background:rgba(0,31,84,.08);border-radius:2px;overflow:hidden;margin-top:.5rem}
+.cplx-fill{height:100%;background:linear-gradient(90deg,var(--navy),var(--cerise),var(--lilac));border-radius:2px;transition:width .4s cubic-bezier(.34,1.56,.64,1)}
+.cplx-note{font-size:.65rem;color:rgba(0,31,84,.38);margin-top:.45rem;font-family:'DM Mono',monospace}
 
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cerise);
-    margin-bottom: 1.15rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(199,160,203,0.3);
-  }
+/* LIVRABLES */
+.liv-list{display:flex;flex-direction:column;gap:.4rem}
+.liv-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;border:1px solid rgba(0,31,84,.09);border-radius:3px;cursor:pointer;transition:all .14s;background:var(--pearl);gap:.8rem}
+.liv-item:hover{border-color:var(--cerise);background:#fff}
+.liv-item.on{border-color:var(--navy);background:var(--navy);color:var(--pearl)}
+.liv-left{display:flex;align-items:center;gap:.65rem;flex:1;min-width:0}
+.liv-name{font-size:.8rem;font-weight:500}
+.liv-desc{font-size:.66rem;opacity:.5;margin-top:1px}
+.chk{width:15px;height:15px;border:1.5px solid rgba(0,31,84,.18);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.58rem;flex-shrink:0}
+.liv-item.on .chk{background:var(--cerise);border-color:var(--cerise);color:#fff}
+.liv-inputs{display:flex;align-items:center;gap:.35rem;flex-shrink:0}
+.liv-inputs input{width:64px;padding:.3rem .45rem;border:1px solid rgba(199,160,203,.5);border-radius:2px;font-family:'DM Mono',monospace;font-size:.72rem;background:rgba(240,241,241,.6);color:var(--ink);text-align:right}
+.liv-item.on .liv-inputs input{background:rgba(255,255,255,.12);border-color:rgba(199,160,203,.4);color:var(--lilac-l)}
+.liv-inputs input:focus{outline:none;border-color:var(--lilac)}
+.liv-inputs .inp-lbl{font-family:'DM Mono',monospace;font-size:.6rem;color:rgba(0,31,84,.35)}
+.liv-item.on .inp-lbl{color:rgba(199,160,203,.5)}
 
-  .sub-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(0,31,84,0.45);
-    margin: 1.1rem 0 0.6rem;
-  }
+/* URGENCY */
+.urg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
+.urg-btn{padding:.75rem .4rem;border:1px solid rgba(0,31,84,.11);border-radius:3px;background:var(--pearl);cursor:pointer;text-align:center;transition:all .14s}
+.urg-name{font-size:.78rem;font-weight:500;display:block}
+.urg-mult{font-family:'DM Mono',monospace;font-size:.66rem;color:rgba(0,31,84,.38);margin-top:.18rem;display:block}
+.urg-btn.on{border-color:var(--navy);background:var(--navy);color:var(--pearl)}
+.urg-btn.on .urg-mult{color:var(--lilac)}
+.urg-btn.on-c{border-color:var(--cerise);background:var(--cerise);color:#fff}
+.urg-btn.on-c .urg-mult{color:rgba(255,255,255,.65)}
+.urg-btn:hover:not(.on):not(.on-c){border-color:var(--cerise)}
 
-  /* ── INPUTS ── */
-  .field-group { margin-bottom: 1rem; }
-  label {
-    display: block;
-    font-size: 0.77rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    margin-bottom: 0.42rem;
-  }
-  input[type="number"],
-  input[type="text"],
-  textarea,
-  select {
-    width: 100%;
-    padding: 0.7rem 1rem;
-    border: 1px solid rgba(0,31,84,0.14);
-    border-radius: 3px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    background: var(--pearl);
-    color: var(--ink);
-    transition: border-color 0.2s, background 0.2s;
-    appearance: none;
-  }
-  textarea { resize: vertical; min-height: 70px; line-height: 1.55; }
-  input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--navy);
-    background: var(--white);
-    box-shadow: 0 0 0 3px rgba(0,31,84,0.05);
-  }
-  .input-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.9rem;
-  }
-  .input-row-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.9rem;
-  }
-  .input-with-unit { position: relative; }
-  .input-with-unit input { padding-right: 3.5rem; }
-  .unit {
-    position: absolute;
-    right: 0.9rem; top: 50%;
-    transform: translateY(-50%);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: rgba(0,31,84,0.3);
-    pointer-events: none;
-  }
+/* DROITS PILLS */
+.pill-grp{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.3rem}
+.pill{padding:.33rem .75rem;border:1px solid rgba(0,31,84,.13);border-radius:20px;font-size:.73rem;cursor:pointer;transition:all .14s;background:var(--pearl);color:var(--muted)}
+.pill:hover{border-color:var(--cerise);color:var(--ink)}
+.pill.on{background:var(--navy);border-color:var(--navy);color:var(--pearl)}
+.coeff-box{background:rgba(0,31,84,.04);border:1px solid rgba(0,31,84,.1);border-radius:3px;padding:.8rem 1rem;margin-top:.9rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.coeff-box .cl{font-size:.76rem;color:var(--muted)}
+.coeff-box .cv{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--navy)}
+.droits-note{font-size:.7rem;color:rgba(0,31,84,.4);font-style:italic;line-height:1.45;margin-bottom:.8rem}
 
-  /* ── CHECKBOX TOGGLES ── */
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.5rem 0;
-    cursor: pointer;
-    border-radius: 3px;
-  }
-  .toggle-row:hover .toggle-box { border-color: var(--cerise); }
-  .toggle-box {
-    width: 16px; height: 16px;
-    border: 1.5px solid rgba(0,31,84,0.2);
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.6rem;
-    flex-shrink: 0;
-    transition: all 0.14s;
-  }
-  .toggle-row.checked .toggle-box {
-    background: var(--cerise);
-    border-color: var(--cerise);
-    color: var(--white);
-  }
-  .toggle-label { font-size: 0.82rem; font-weight: 500; }
-  .toggle-desc { font-size: 0.68rem; color: var(--ink-soft); margin-top: 1px; }
+/* DROITS TABLE */
+.dtable{width:100%;border-collapse:collapse;margin-top:.6rem;font-size:.73rem}
+.dtable thead th{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,31,84,.45);text-align:left;padding:.38rem .55rem;border-bottom:1px solid rgba(0,31,84,.1)}
+.dtable tbody td{padding:.42rem .55rem;border-bottom:1px solid rgba(0,31,84,.05);vertical-align:top;line-height:1.4}
+.dtable tbody tr:last-child td{border-bottom:none}
+.dtable tbody tr:hover td{background:rgba(199,160,203,.07)}
+.td-c{font-weight:600;color:var(--navy);white-space:nowrap}
+.td-p{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--cerise);white-space:nowrap}
+.td-n{color:var(--muted);font-size:.7rem}
+.dgrp td{background:rgba(0,31,84,.04);font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cerise);padding:.45rem .55rem .28rem;border-bottom:none!important}
+.sources{background:rgba(0,31,84,.03);border:1px solid rgba(0,31,84,.08);border-left:3px solid var(--navy);border-radius:0 3px 3px 0;padding:.9rem 1rem;margin-top:1.2rem;font-size:.71rem;color:var(--muted);line-height:1.6}
+.sources strong{color:var(--navy);font-weight:600;display:block;margin-bottom:.38rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase}
+.sources ul{list-style:none;display:flex;flex-direction:column;gap:.22rem}
+.sources ul li{display:flex;gap:.45rem}
+.sources ul li::before{content:'›';color:var(--cerise);flex-shrink:0}
+.sources .disc{margin-top:.65rem;padding-top:.65rem;border-top:1px solid rgba(0,31,84,.08);font-style:italic;font-size:.68rem;color:rgba(0,31,84,.38)}
 
-  /* ── MULTI-SELECT PILLS (droits) ── */
-  .pill-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.3rem;
-  }
-  .pill {
-    padding: 0.38rem 0.85rem;
-    border: 1px solid rgba(0,31,84,0.14);
-    border-radius: 20px;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.14s;
-    background: var(--pearl);
-    color: var(--ink-soft);
-    font-family: 'DM Sans', sans-serif;
-  }
-  .pill:hover { border-color: var(--cerise); color: var(--ink); }
-  .pill.active { background: var(--navy); border-color: var(--navy); color: var(--pearl); }
+/* QUOTE PANEL */
+.qpanel{position:sticky;top:2rem}
+.qcard{background:var(--navy);color:var(--pearl);padding:2rem;border-radius:4px;position:relative;overflow:hidden}
+.qcard::before{content:'';position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(199,160,203,.1) 0%,transparent 68%);pointer-events:none}
+.qcard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cerise),var(--lilac))}
+.qhdr{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--lilac);margin-bottom:1.4rem;display:flex;align-items:center;gap:.5rem}
+.qhdr::after{content:'';flex:1;height:1px;background:rgba(199,160,203,.18)}
+.qproj{font-family:'Playfair Display',serif;font-size:.9rem;font-style:italic;color:rgba(240,241,241,.45);margin-bottom:1.2rem;min-height:1.2em;word-break:break-word;line-height:1.4}
+.price-lbl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;opacity:.4;margin-bottom:.25rem}
+.price-main{font-family:'Playfair Display',serif;font-size:2.9rem;font-weight:700;color:#fff;line-height:1;letter-spacing:-.02em;display:flex;align-items:baseline;gap:.15rem}
+.price-eur{font-size:1.3rem;color:var(--lilac)}
+.price-range{font-family:'DM Mono',monospace;font-size:.68rem;color:rgba(240,241,241,.3);margin-top:.35rem;margin-bottom:1.5rem}
+.bkd{border-top:1px solid rgba(240,241,241,.07);padding-top:1.1rem;margin-bottom:1.1rem}
+.bkd-ttl{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,241,241,.28);margin-bottom:.75rem}
+.bkd-row{display:flex;justify-content:space-between;align-items:center;padding:.28rem 0;font-size:.75rem}
+.bkd-row.tot{border-top:1px solid rgba(240,241,241,.09);padding-top:.65rem;margin-top:.28rem;font-weight:600;color:#fff}
+.bkd-k{opacity:.5}
+.bkd-v{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--lilac-l)}
+.bkd-row.tot .bkd-v{color:var(--lilac);font-size:.84rem}
+.tva{font-family:'DM Mono',monospace;font-size:.57rem;color:rgba(240,241,241,.27);margin-top:.38rem;font-style:italic}
+.maint-badge{background:rgba(199,160,203,.12);border:1px solid rgba(199,160,203,.2);border-radius:3px;padding:.45rem .7rem;margin-top:.7rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--lilac-l);display:none}
+.maint-badge.show{display:block}
+.qactions{display:flex;flex-direction:column;gap:.4rem;margin-top:1.1rem}
+.btn-p{width:100%;padding:.85rem;background:var(--cerise);color:#fff;border:none;border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:background .15s,transform .1s}
+.btn-p:hover{background:var(--cerise-l);transform:translateY(-1px)}
+.btn-p:active{transform:translateY(0)}
+.btn-s{width:100%;padding:.75rem;background:transparent;color:var(--pearl);border:1px solid rgba(240,241,241,.16);border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:border-color .15s}
+.btn-s:hover{border-color:rgba(199,160,203,.45)}
+.tip{background:#fff;border:1px solid rgba(0,31,84,.07);border-left:3px solid var(--lilac);padding:.8rem 1rem;border-radius:0 3px 3px 0;margin-top:.8rem;font-size:.75rem;color:var(--muted);line-height:1.55}
+.tip strong{color:var(--navy);font-weight:600}
+.tip em{font-style:italic;color:var(--ink)}
 
-  /* ── OPTIONS (section 04) ── */
-  .option-list { display: flex; flex-direction: column; gap: 0.45rem; }
-  .option-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.65rem 0.85rem;
-    border: 1px solid rgba(0,31,84,0.09);
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.14s;
-    background: var(--pearl);
-  }
-  .option-item:hover { border-color: var(--cerise); background: var(--white); }
-  .option-item.checked { border-color: var(--navy); background: var(--navy); color: var(--pearl); }
-  .option-left { display: flex; align-items: center; gap: 0.7rem; }
-  .option-name { font-size: 0.82rem; font-weight: 500; }
-  .option-desc { font-size: 0.67rem; opacity: 0.5; margin-top: 1px; }
-  .option-price {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.73rem;
-    color: var(--cerise);
-    flex-shrink: 0;
-  }
-  .option-item.checked .option-price { color: var(--lilac-light); }
-  .check-mark {
-    width: 16px; height: 16px;
-    border: 1.5px solid rgba(0,31,84,0.18);
-    border-radius: 2px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; flex-shrink: 0;
-  }
-  .option-item.checked .check-mark { background: var(--cerise); border-color: var(--cerise); color: var(--white); }
+/* FOOTER */
+footer{background:var(--navy-dk);padding:2.5rem;margin-top:3rem;position:relative}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cerise),var(--lilac),var(--cerise))}
+.ft{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.ft-brand{color:var(--lilac);font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;display:block;margin-bottom:.45rem;letter-spacing:.05em}
+.ft-copy{font-family:'DM Mono',monospace;font-size:.64rem;color:rgba(240,241,241,.4);line-height:1.7}
+.ft-cgu h3{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cerise);margin-bottom:.75rem}
+.ft-cgu ul{list-style:none;display:flex;flex-direction:column;gap:.28rem}
+.ft-cgu ul li{font-family:'DM Mono',monospace;font-size:.61rem;color:rgba(240,241,241,.37);display:flex;align-items:flex-start;gap:.45rem;line-height:1.4}
+.ft-cgu ul li::before{content:'—';color:var(--cerise);flex-shrink:0}
+.ft-warn{grid-column:1/-1;border-top:1px solid rgba(180,33,80,.18);padding-top:1.1rem;margin-top:.4rem;font-family:'DM Mono',monospace;font-size:.59rem;color:rgba(180,33,80,.62);line-height:1.7}
 
-  /* option with free input for price */
-  .option-item .free-input {
-    width: 90px;
-    padding: 0.3rem 0.5rem;
-    border: 1px solid rgba(199,160,203,0.5);
-    border-radius: 2px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    background: rgba(240,241,241,0.5);
-    color: var(--ink);
-    text-align: right;
-  }
-  .option-item.checked .free-input {
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(199,160,203,0.4);
-    color: var(--lilac-light);
-  }
-  .option-item .free-input:focus { outline: none; border-color: var(--lilac); }
+@media(max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  .qpanel{position:static}
+  .hd-title h1{font-size:1.4rem}
+  .ft{grid-template-columns:1fr}
+  .ft-warn{grid-column:1}
+  .cplx-grid{grid-template-columns:repeat(3,1fr)}
+}
 
-  /* ── COMPLEXITY ── */
-  .complexity-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.4rem;
-    margin-bottom: 0.55rem;
-  }
-  .complexity-btn {
-    padding: 0.68rem 0.2rem;
-    border: 1px solid rgba(0,31,84,0.11);
-    border-radius: 3px;
-    background: var(--pearl);
-    cursor: pointer;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.66rem;
-    text-align: center;
-    color: var(--ink-soft);
-    transition: all 0.15s;
-    display: flex; flex-direction: column; align-items: center; gap: 0.38rem;
-  }
-  .complexity-btn .dot-row { display: flex; gap: 3px; }
-  .complexity-btn .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(0,31,84,0.16); }
-  .complexity-btn.active { border-color: var(--navy); background: var(--navy); color: var(--pearl); }
-  .complexity-btn.active .dot { background: var(--lilac); }
-  .complexity-btn:hover:not(.active) { border-color: var(--cerise); color: var(--ink); }
-  .complexity-bar { height: 3px; background: rgba(0,31,84,0.08); border-radius: 2px; overflow: hidden; margin-top: 0.55rem; }
-  .complexity-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--navy), var(--cerise), var(--lilac));
-    border-radius: 2px;
-    transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .complexity-note { font-size: 0.66rem; color: rgba(0,31,84,0.38); margin-top: 0.48rem; font-family: 'DM Mono', monospace; }
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff;font-size:11pt}
+  header{background:#001F54!important;color:#fff!important;border-bottom:3px solid #B42150!important;padding:0;margin-bottom:1cm}
+  .hd{max-width:100%;padding:.6cm 1cm}
+  .badge,.dot{display:none}
+  .wrap{display:block;padding:0 1cm;max-width:100%}
 
-  /* ── URGENCY ── */
-  .urgency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
-  .urgency-btn {
-    padding: 0.8rem 0.4rem;
-    border: 1px solid rgba(0,31,84,0.11);
-    border-radius: 3px;
-    background: var(--pearl);
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.14s;
-  }
-  .urgency-label { font-size: 0.78rem; font-weight: 500; display: block; }
-  .urgency-mult { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: rgba(0,31,84,0.38); margin-top: 0.2rem; display: block; }
-  .urgency-btn.active { border-color: var(--navy); background: var(--navy); color: var(--pearl); }
-  .urgency-btn.active .urgency-mult { color: var(--lilac); }
-  .urgency-btn.active-cerise { border-color: var(--cerise); background: var(--cerise); color: var(--white); }
-  .urgency-btn.active-cerise .urgency-mult { color: rgba(255,255,255,0.65); }
-  .urgency-btn:hover:not(.active):not(.active-cerise) { border-color: var(--cerise); }
+  /* Hide left column params — print only the quote */
+  .wrap > div:first-child{display:none}
 
-  /* ── DROITS COEFFICIENT ── */
-  .droits-coefficient {
-    background: rgba(0,31,84,0.04);
-    border: 1px solid rgba(0,31,84,0.1);
-    border-radius: 3px;
-    padding: 0.9rem 1rem;
-    margin-top: 1rem;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .droits-coefficient .coeff-label { color: var(--ink-soft); font-size: 0.77rem; }
-  .droits-coefficient .coeff-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--navy);
-  }
-  .droits-info {
-    font-size: 0.7rem;
-    color: rgba(0,31,84,0.45);
-    margin-top: 0.5rem;
-    font-style: italic;
-    line-height: 1.45;
-  }
+  /* Quote panel full width */
+  .qpanel{position:static;width:100%;max-width:18cm;margin:0 auto}
+  .qcard{background:#001F54!important;color:#F0F1F1!important;padding:1.2cm;border-radius:4px;page-break-inside:avoid;box-shadow:none}
+  .qcard::after{background:linear-gradient(90deg,#B42150,#C7A0CB)!important;height:3px}
+  .qhdr{color:#C7A0CB!important;font-size:7pt;margin-bottom:.6cm}
+  .qproj{font-size:10pt;color:rgba(240,241,241,.6)!important;margin-bottom:.5cm}
+  .price-main{font-size:32pt!important}
+  .price-eur{color:#C7A0CB!important;font-size:16pt!important}
+  .price-range{font-size:8pt;margin-bottom:.5cm}
+  .bkd{border-top:1px solid rgba(240,241,241,.15)!important;padding-top:.4cm}
+  .bkd-row{padding:.15rem 0}
+  .bkd-v{color:#C7A0CB!important}
+  .bkd-row.tot .bkd-v{color:#C7A0CB!important;font-size:10pt!important}
+  .tva{font-size:7pt;color:rgba(240,241,241,.4)!important;margin-top:.3cm}
+  .maint-badge{background:rgba(199,160,203,.15)!important;border:1px solid rgba(199,160,203,.25)!important}
+  .qactions,.tip,.btn-p,.btn-s{display:none!important}
 
-  /* ── DROITS TABLE ── */
-  .droits-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 0.6rem;
-    font-size: 0.75rem;
-  }
-  .droits-table thead th {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(0,31,84,0.45);
-    text-align: left;
-    padding: 0.4rem 0.6rem;
-    border-bottom: 1px solid rgba(0,31,84,0.1);
-  }
-  .droits-table tbody td {
-    padding: 0.45rem 0.6rem;
-    border-bottom: 1px solid rgba(0,31,84,0.05);
-    vertical-align: top;
-    line-height: 1.4;
-  }
-  .droits-table tbody tr:last-child td { border-bottom: none; }
-  .droits-table tbody tr:hover td { background: rgba(199,160,203,0.07); }
-  .droits-table .td-cat {
-    font-weight: 600;
-    color: var(--navy);
-    white-space: nowrap;
-  }
-  .droits-table .td-pct {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--cerise);
-    white-space: nowrap;
-  }
-  .droits-table .td-note { color: var(--ink-soft); font-size: 0.72rem; }
+  /* Footer print */
+  footer{background:#001440!important;color:rgba(240,241,241,.5)!important;margin-top:.8cm;padding:.5cm 1cm}
+  footer::before{background:linear-gradient(90deg,#B42150,#C7A0CB,#B42150)!important}
+  .ft{display:flex;gap:1cm;max-width:100%}
+  .ft-brand{color:#C7A0CB!important}
+  .ft-copy{font-size:7pt}
+  .ft-cgu h3{color:#B42150!important}
+  .ft-cgu ul li{font-size:7pt;color:rgba(240,241,241,.4)!important}
+  .ft-warn{font-size:6.5pt;color:rgba(180,33,80,.7)!important}
 
-  .droits-group-header td {
-    background: rgba(0,31,84,0.04);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--cerise);
-    padding: 0.5rem 0.6rem 0.3rem;
-    border-bottom: none !important;
-  }
+  /* Print header: add GraphiQuote name prominently */
+  .print-title{display:block!important}
 
-  /* Sources block */
-  .sources-block {
-    background: rgba(0,31,84,0.03);
-    border: 1px solid rgba(0,31,84,0.08);
-    border-left: 3px solid var(--navy);
-    border-radius: 0 3px 3px 0;
-    padding: 1rem 1.1rem;
-    margin-top: 1.3rem;
-    font-size: 0.72rem;
-    color: var(--ink-soft);
-    line-height: 1.6;
-  }
-  .sources-block strong { color: var(--navy); font-weight: 600; display: block; margin-bottom: 0.4rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; }
-  .sources-block ul { list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
-  .sources-block ul li { display: flex; gap: 0.5rem; align-items: flex-start; }
-  .sources-block ul li::before { content: '›'; color: var(--cerise); flex-shrink: 0; }
-  .sources-block .disclaimer {
-    margin-top: 0.7rem;
-    padding-top: 0.7rem;
-    border-top: 1px solid rgba(0,31,84,0.08);
-    font-style: italic;
-    font-size: 0.7rem;
-    color: rgba(0,31,84,0.4);
-  }
-
-  /* ── QUOTE PANEL ── */
-  .quote-panel { position: sticky; top: 2rem; animation: slideUp 0.35s 0.22s ease both; }
-  .quote-card {
-    background: var(--navy);
-    color: var(--pearl);
-    padding: 2rem;
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
-  }
-  .quote-card::before {
-    content: '';
-    position: absolute;
-    top: -90px; right: -90px;
-    width: 240px; height: 240px;
-    background: radial-gradient(circle, rgba(199,160,203,0.1) 0%, transparent 68%);
-    pointer-events: none;
-  }
-  .quote-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--cerise), var(--lilac));
-  }
-  .quote-header {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--lilac);
-    margin-bottom: 1.6rem;
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .quote-header::after { content: ''; flex: 1; height: 1px; background: rgba(199,160,203,0.18); }
-  .quote-project {
-    font-family: 'Playfair Display', serif;
-    font-size: 0.92rem;
-    font-style: italic;
-    color: rgba(240,241,241,0.48);
-    margin-bottom: 1.3rem;
-    min-height: 1.3em;
-    word-break: break-word;
-    line-height: 1.4;
-  }
-  .price-display { margin-bottom: 1.7rem; }
-  .price-range-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; opacity: 0.4; margin-bottom: 0.28rem; }
-  .price-main {
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem; font-weight: 700;
-    color: var(--white); line-height: 1;
-    letter-spacing: -0.02em;
-    display: flex; align-items: baseline; gap: 0.2rem;
-  }
-  .price-main .euro { font-size: 1.35rem; color: var(--lilac); }
-  .price-range { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: rgba(240,241,241,0.32); margin-top: 0.38rem; }
-
-  .breakdown { border-top: 1px solid rgba(240,241,241,0.07); padding-top: 1.2rem; margin-bottom: 1.2rem; }
-  .breakdown-title { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,241,241,0.28); margin-bottom: 0.85rem; }
-  .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 0.32rem 0; font-size: 0.76rem; }
-  .breakdown-row.total { border-top: 1px solid rgba(240,241,241,0.09); padding-top: 0.7rem; margin-top: 0.3rem; font-weight: 600; color: var(--white); }
-  .breakdown-row.sub { opacity: 0.7; font-size: 0.7rem; padding-left: 0.8rem; }
-  .breakdown-key { opacity: 0.52; }
-  .breakdown-val { font-family: 'DM Mono', monospace; font-size: 0.71rem; color: var(--lilac-light); }
-  .breakdown-row.total .breakdown-val { color: var(--lilac); font-size: 0.85rem; }
-
-  .tva-mention { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: rgba(240,241,241,0.28); margin-top: 0.4rem; font-style: italic; }
-
-  /* maintenance badge in quote */
-  .maintenance-badge {
-    background: rgba(199,160,203,0.12);
-    border: 1px solid rgba(199,160,203,0.2);
-    border-radius: 3px;
-    padding: 0.5rem 0.75rem;
-    margin-top: 0.8rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--lilac-light);
-    display: none;
-  }
-  .maintenance-badge.visible { display: block; }
-
-  .quote-actions { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1.2rem; }
-  .btn-primary {
-    width: 100%; padding: 0.88rem;
-    background: var(--cerise); color: var(--white);
-    border: none; border-radius: 3px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.86rem; font-weight: 600;
-    cursor: pointer; transition: background 0.15s, transform 0.1s;
-    letter-spacing: 0.02em;
-  }
-  .btn-primary:hover { background: var(--cerise-light); transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-secondary {
-    width: 100%; padding: 0.78rem;
-    background: transparent; color: var(--pearl);
-    border: 1px solid rgba(240,241,241,0.16);
-    border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
-    cursor: pointer; transition: border-color 0.15s;
-  }
-  .btn-secondary:hover { border-color: rgba(199,160,203,0.45); }
-
-  .tip-card {
-    background: var(--white);
-    border: 1px solid rgba(0,31,84,0.07);
-    border-left: 3px solid var(--lilac);
-    padding: 0.85rem 1rem;
-    border-radius: 0 3px 3px 0;
-    margin-top: 0.85rem;
-    font-size: 0.76rem;
-    color: var(--ink-soft);
-    line-height: 1.55;
-  }
-  .tip-card strong { color: var(--navy); font-weight: 600; }
-  .tip-card em { font-style: italic; color: var(--ink); }
-
-  /* ── FOOTER ── */
-  footer {
-    background: var(--navy-dark);
-    color: rgba(240,241,241,0.42);
-    margin-top: 3rem;
-    padding: 2.5rem 2.5rem 2rem;
-    position: relative; z-index: 1;
-  }
-  footer::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--cerise), var(--lilac), var(--cerise));
-  }
-  .footer-inner {
-    max-width: 1120px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2.5rem;
-    align-items: start;
-  }
-  .footer-copyright { font-family: 'DM Mono', monospace; font-size: 0.66rem; line-height: 1.7; letter-spacing: 0.02em; }
-  .footer-brand { color: var(--lilac); font-size: 1rem; font-family: 'Playfair Display', serif; font-weight: 700; display: block; margin-bottom: 0.5rem; letter-spacing: 0.06em; }
-  .footer-cgu h3 { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cerise); margin-bottom: 0.85rem; }
-  .footer-cgu ul { list-style: none; display: flex; flex-direction: column; gap: 0.32rem; }
-  .footer-cgu ul li { font-family: 'DM Mono', monospace; font-size: 0.63rem; color: rgba(240,241,241,0.38); display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4; }
-  .footer-cgu ul li::before { content: '—'; color: var(--cerise); flex-shrink: 0; }
-  .footer-warning { grid-column: 1 / -1; border-top: 1px solid rgba(180,33,80,0.18); padding-top: 1.2rem; margin-top: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(180,33,80,0.65); line-height: 1.7; letter-spacing: 0.02em; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 840px) {
-    .main-grid { grid-template-columns: 1fr; }
-    .quote-panel { position: static; }
-    .header-title h1 { font-size: 1.35rem; }
-    .footer-inner { grid-template-columns: 1fr; }
-    .footer-warning { grid-column: 1; }
-    .complexity-grid { grid-template-columns: repeat(3, 1fr); }
-    .header-inner, .main-wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .input-row-3 { grid-template-columns: 1fr 1fr; }
-  }
+  @page{margin:1.5cm 1cm;size:A4 portrait}
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
-  <div class="header-inner">
-    <div class="logo-area">
-      <img alt="Logo" src="https://d1yei2z3i6k35z.cloudfront.net/13882048/68b9ba238c879_Logo.png" style="display:block;max-width:100%;max-height:100%;object-fit:contain;">
+  <div class="hd">
+    <div class="logo-wrap">
+      <img src="https://d1yei2z3i6k35z.cloudfront.net/13882048/68b9ba238c879_Logo.png" alt="CERISE UP">
     </div>
-    <div class="header-title">
-      <h1>Outil de <em>tarification</em></h1>
-      <p class="subtitle">Pour graphiste indépendant · Calcul en temps réel</p>
+    <div class="hd-title">
+      <h1><em>GraphiQuote</em></h1>
+      <p>Outil de tarification pour graphiste indépendant · by CERISE UP</p>
     </div>
-    <span class="live-badge"><span class="live-dot"></span>Calcul live</span>
+    <span class="badge"><span class="dot"></span>Calcul live</span>
   </div>
 </header>
 
-<!-- MAIN -->
-<div class="main-wrap">
-  <div class="main-grid">
+<div class="wrap">
+<div><!-- LEFT COLUMN -->
+
+<!-- 01 DESCRIPTION -->
+<div class="sec">
+  <div class="sec-lbl">01 — Description &amp; contexte du projet</div>
+  <div class="fld">
+    <label>Décrivez librement votre projet</label>
+    <textarea id="desc" placeholder="Ex : Identité visuelle complète pour une marque de cosmétiques — logo, palette, typographie, déclinaisons print et web." oninput="syncDesc()"></textarea>
+  </div>
+
+  <div class="sub-lbl">Déplacement chez le client</div>
+  <div class="row2" style="margin-bottom:.6rem">
+    <div class="fld" style="margin-bottom:0">
+      <label>Distance aller-retour</label>
+      <div class="iu"><input type="number" id="km" value="0" min="0" oninput="calc()"><span class="iu-lbl">km</span></div>
+    </div>
+    <div class="fld" style="margin-bottom:0">
+      <label>Tarif kilométrique</label>
+      <div class="iu"><input type="number" id="kmr" value="0.42" min="0" step="0.01" oninput="calc()"><span class="iu-lbl">€/km</span></div>
+    </div>
+  </div>
+  <div class="row2" style="margin-bottom:.8rem">
+    <div class="fld" style="margin-bottom:0">
+      <label>Temps de déplacement</label>
+      <div class="iu"><input type="number" id="kmh" value="0" min="0" step="0.5" oninput="calc()"><span class="iu-lbl">h</span></div>
+    </div>
+    <div style="display:flex;align-items:flex-end;padding-bottom:.1rem">
+      <small style="font-size:.68rem;color:var(--muted);line-height:1.4">Facturé au taux horaire (section 02)</small>
+    </div>
+  </div>
+
+  <div class="sub-lbl">Réunion de lancement</div>
+  <div class="tgl" id="tReunion" onclick="toggle('tReunion')">
+    <div class="tbox">✓</div>
     <div>
+      <div class="tgl-name">Réunion début de projet (1h)</div>
+      <div class="tgl-desc">Facturée au taux horaire défini en section 02</div>
+    </div>
+  </div>
+</div>
 
-      <!-- ══ 01 DESCRIPTION & CONTEXTE ══ -->
-      <div class="section">
-        <div class="section-label">01 — Description & contexte du projet</div>
+<!-- 02 TEMPS -->
+<div class="sec">
+  <div class="sec-lbl">02 — Temps de travail</div>
+  <div class="row2">
+    <div class="fld">
+      <label>Taux horaire</label>
+      <div class="iu"><input type="number" id="rate" value="70" min="10" oninput="calc()"><span class="iu-lbl">€/h</span></div>
+    </div>
+    <div class="fld">
+      <label>Heures estimées</label>
+      <div class="iu"><input type="number" id="hrs" value="8" min="0.5" step="0.5" oninput="calc()"><span class="iu-lbl">h</span></div>
+    </div>
+  </div>
+  <div class="fld" style="margin-bottom:0">
+    <label>Révisions incluses</label>
+    <div class="iu"><input type="number" id="rev" value="3" min="0" max="20" oninput="calc()"><span class="iu-lbl">tours</span></div>
+  </div>
+</div>
 
-        <div class="field-group">
-          <label>Décrivez librement votre projet</label>
-          <textarea id="projectDesc"
-            placeholder="Ex : Création d'une identité visuelle pour une marque de cosmétiques — logo, palette, typographie, déclinaisons print et web."
-            oninput="updateQuoteProject()"></textarea>
-        </div>
+<!-- 03 LIVRABLES -->
+<div class="sec">
+  <div class="sec-lbl">03 — Livrables</div>
+  <p style="font-size:.75rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5">Saisissez un <strong style="color:var(--navy)">montant fixe (€)</strong> et/ou un <strong style="color:var(--navy)">pourcentage (%) du total</strong>. Les deux s'additionnent.</p>
+  <div class="liv-list">
 
-        <!-- Déplacement -->
-        <div class="sub-label">Déplacement chez le client</div>
-        <div class="input-row" style="margin-bottom:0.6rem">
-          <div class="field-group" style="margin-bottom:0">
-            <label>Distance aller-retour</label>
-            <div class="input-with-unit">
-              <input type="number" id="kmDistance" value="0" min="0" step="1" oninput="calculate()">
-              <span class="unit">km</span>
-            </div>
-          </div>
-          <div class="field-group" style="margin-bottom:0">
-            <label>Tarif kilométrique</label>
-            <div class="input-with-unit">
-              <input type="number" id="kmRate" value="0.42" min="0" step="0.01" oninput="calculate()">
-              <span class="unit">€/km</span>
-            </div>
-          </div>
-        </div>
-        <div class="input-row" style="margin-bottom:0.9rem">
-          <div class="field-group" style="margin-bottom:0">
-            <label>Temps de déplacement</label>
-            <div class="input-with-unit">
-              <input type="number" id="travelHours" value="0" min="0" step="0.5" oninput="calculate()">
-              <span class="unit">h</span>
-            </div>
-          </div>
-          <div style="display:flex;align-items:flex-end;padding-bottom:0.1rem;">
-            <small style="font-size:0.7rem;color:var(--ink-soft);line-height:1.4;">Le temps de trajet est facturé au taux horaire défini en section 02.</small>
-          </div>
-        </div>
-
-        <!-- Réunion début de projet -->
-        <div class="sub-label">Réunion de lancement</div>
-        <div class="toggle-row" id="toggleReunion" onclick="toggleCheck('toggleReunion', 0, true); calculate()">
-          <div class="toggle-box">✓</div>
-          <div>
-            <div class="toggle-label">Réunion début de projet (1h)</div>
-            <div class="toggle-desc">Facturée au taux horaire défini en section 02</div>
-          </div>
-        </div>
-
+    <div class="liv-item" id="lBench" onclick="togLiv(event,'lBench')">
+      <div class="liv-left">
+        <div class="chk">✓</div>
+        <div><div class="liv-name">Benchmark / Moodboard</div><div class="liv-desc">Analyse concurrentielle, planche d'inspiration</div></div>
       </div>
-
-      <!-- ══ 02 TEMPS DE TRAVAIL ══ -->
-      <div class="section">
-        <div class="section-label">02 — Temps de travail</div>
-        <div class="input-row">
-          <div class="field-group">
-            <label>Taux horaire</label>
-            <div class="input-with-unit">
-              <input type="number" id="hourlyRate" value="70" min="10" max="2000" oninput="calculate()">
-              <span class="unit">€/h</span>
-            </div>
-          </div>
-          <div class="field-group">
-            <label>Heures estimées</label>
-            <div class="input-with-unit">
-              <input type="number" id="hours" value="8" min="0.5" step="0.5" oninput="calculate()">
-              <span class="unit">h</span>
-            </div>
-          </div>
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <label>Révisions incluses</label>
-          <div class="input-with-unit">
-            <input type="number" id="revisions" value="3" min="0" max="20" oninput="calculate()">
-            <span class="unit">tours</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ 03 COMPLEXITÉ ══ -->
-      <div class="section">
-        <div class="section-label">03 — Complexité de la demande</div>
-        <div class="complexity-grid">
-          <button class="complexity-btn" onclick="setComplexity(1, this)">
-            <div class="dot-row"><div class="dot"></div></div>
-            <span>Simple ×1</span>
-          </button>
-          <button class="complexity-btn active" onclick="setComplexity(1, this)">
-            <div class="dot-row"><div class="dot"></div><div class="dot"></div></div>
-            <span>Facile ×1</span>
-          </button>
-          <button class="complexity-btn" onclick="setComplexity(1.25, this)">
-            <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-            <span>Moyen ×1.25</span>
-          </button>
-          <button class="complexity-btn" onclick="setComplexity(1.5, this)">
-            <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-            <span>Complexe ×1.5</span>
-          </button>
-          <button class="complexity-btn" onclick="setComplexity(2, this)">
-            <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-            <span>Expert ×2</span>
-          </button>
-        </div>
-        <div class="complexity-bar">
-          <div class="complexity-fill" id="complexityBar" style="width:10%"></div>
-        </div>
-        <p class="complexity-note" id="complexityLabel">Modificateur actuel : ×1</p>
-      </div>
-
-      <!-- ══ 03 LIVRABLES ══ -->
-      <div class="section">
-        <div class="section-label">03 — Livrables</div>
-        <p style="font-size:0.76rem;color:var(--ink-soft);margin-bottom:1rem;line-height:1.5;">Saisissez un montant fixe (€) ou un pourcentage (%) du total. Les deux champs sont indépendants — remplissez l'un ou l'autre.</p>
-        <div class="option-list" id="livrableslist">
-
-          <!-- Benchmark / Moodboard -->
-          <div class="option-item" id="optBenchmark" onclick="toggleLivrable(event,'optBenchmark')">
-            <div class="option-left">
-              <div class="check-mark">✓</div>
-              <div>
-                <div class="option-name">Benchmark / Moodboard</div>
-                <div class="option-desc">Analyse concurrentielle, planche d'inspiration</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
-              <input class="free-input" id="benchAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
-              <input class="free-input" id="benchPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
-            </div>
-          </div>
-
-          <!-- Déclinaison réseaux sociaux -->
-          <div class="option-item" id="optReseaux" onclick="toggleLivrable(event,'optReseaux')">
-            <div class="option-left">
-              <div class="check-mark">✓</div>
-              <div>
-                <div class="option-name">Déclinaison réseaux sociaux</div>
-                <div class="option-desc">Formats adaptés Instagram, LinkedIn, Facebook…</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
-              <input class="free-input" id="reseauxAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
-              <input class="free-input" id="reseauxPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
-            </div>
-          </div>
-
-          <!-- Suivi d'impression -->
-          <div class="option-item" id="optImpression" onclick="toggleLivrable(event,'optImpression')">
-            <div class="option-left">
-              <div class="check-mark">✓</div>
-              <div>
-                <div class="option-name">Suivi d'impression</div>
-                <div class="option-desc">Coordination imprimeur, BAT</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
-              <input class="free-input" id="suiviAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
-              <input class="free-input" id="suiviPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
-            </div>
-          </div>
-
-          <!-- Fichiers sources -->
-          <div class="option-item" id="optSources" onclick="toggleLivrable(event,'optSources')">
-            <div class="option-left">
-              <div class="check-mark">✓</div>
-              <div>
-                <div class="option-name">Fichiers sources livrés</div>
-                <div class="option-desc">AI, PSD, Figma, formats éditables</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
-              <input class="free-input" id="sourcesAmt" type="number" value="" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calculate()" style="width:70px">
-              <input class="free-input" id="sourcesPct" type="number" value="" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calculate()" style="width:60px">
-            </div>
-          </div>
-
-          <!-- Maintenance mensuelle -->
-          <div class="option-item" id="optMaintenance" onclick="toggleLivrable(event,'optMaintenance')">
-            <div class="option-left">
-              <div class="check-mark">✓</div>
-              <div>
-                <div class="option-name">Maintenance mensuelle</div>
-                <div class="option-desc">Mises à jour, ajustements, suivi régulier</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
-              <input class="free-input" id="maintenanceAmt" type="number" value="" min="0" placeholder="€/mois" onclick="event.stopPropagation()" oninput="updateMaintenanceBadge()" style="width:90px">
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ══ 05 URGENCE ══ -->
-      <div class="section">
-        <div class="section-label">05 — Délai & urgence</div>
-        <div class="urgency-grid">
-          <button class="urgency-btn" onclick="setUrgency(0.9, this)">
-            <span class="urgency-label">Flexible</span>
-            <span class="urgency-mult">−10%</span>
-          </button>
-          <button class="urgency-btn active" onclick="setUrgency(1, this)">
-            <span class="urgency-label">Standard</span>
-            <span class="urgency-mult">×1</span>
-          </button>
-          <button class="urgency-btn" onclick="setUrgency(1.35, this, 'cerise')">
-            <span class="urgency-label">Urgent</span>
-            <span class="urgency-mult">+35%</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- ══ 06 DROITS D'AUTEUR & UTILISATION ══ -->
-      <div class="section">
-        <div class="section-label">06 — Droits d'auteur & utilisation des créations</div>
-
-        <p style="font-size:0.8rem;color:var(--ink-soft);line-height:1.6;margin-bottom:1.2rem;">
-          En droit français, la <strong style="color:var(--navy)">cession de droits d'auteur</strong> se facture séparément des honoraires de création (art. L.131-3 du Code de la Propriété Intellectuelle). Elle doit être précisée selon trois critères : le <em>type d'utilisation</em>, les <em>supports de diffusion</em>, la <em>durée</em> et le <em>territoire</em>.
-        </p>
-
-        <div class="field-group">
-          <label>Type d'utilisation</label>
-          <div class="pill-group" id="pillUsage">
-            <span class="pill" data-coeff="0.10" onclick="togglePill(this)">Commercial <em>+10%</em></span>
-            <span class="pill" data-coeff="0.08" onclick="togglePill(this)">Éditorial <em>+8%</em></span>
-            <span class="pill" data-coeff="0.12" onclick="togglePill(this)">Logo / Identité visuelle <em>+12%</em></span>
-            <span class="pill" data-coeff="0.07" onclick="togglePill(this)">Illustration pédagogique <em>+7%</em></span>
-            <span class="pill" data-coeff="0.15" onclick="togglePill(this)">Motifs sur supports multiples <em>+15%</em></span>
-            <span class="pill" data-coeff="0.06" onclick="togglePill(this)">Usage interne <em>+6%</em></span>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label>Supports de diffusion</label>
-          <div class="pill-group" id="pillSupports">
-            <span class="pill" data-coeff="0.05" onclick="togglePill(this)">Web / Digital</span>
-            <span class="pill" data-coeff="0.08" onclick="togglePill(this)">Print / Presse</span>
-            <span class="pill" data-coeff="0.10" onclick="togglePill(this)">Textile / Packaging</span>
-            <span class="pill" data-coeff="0.07" onclick="togglePill(this)">Signalétique</span>
-            <span class="pill" data-coeff="0.09" onclick="togglePill(this)">Publicité / Affichage</span>
-            <span class="pill" data-coeff="0.12" onclick="togglePill(this)">Tous supports</span>
-          </div>
-        </div>
-
-        <div class="input-row" style="margin-bottom:1rem">
-          <div class="field-group" style="margin-bottom:0">
-            <label>Durée de cession</label>
-            <select id="cessionDuree" onchange="calculate()">
-              <option value="0.05">1 an</option>
-              <option value="0.10">3 ans</option>
-              <option value="0.15" selected>5 ans</option>
-              <option value="0.25">10 ans</option>
-              <option value="0.40">Illimité</option>
-            </select>
-          </div>
-          <div class="field-group" style="margin-bottom:0">
-            <label>Territoire</label>
-            <select id="cessionTerritoire" onchange="calculate()">
-              <option value="0.00" selected>France</option>
-              <option value="0.05">Europe</option>
-              <option value="0.12">Monde</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="droits-coefficient">
-          <div>
-            <div class="coeff-label">Montant de cession calculé</div>
-            <div style="font-size:0.67rem;color:rgba(0,31,84,0.38);margin-top:2px;">Appliqué sur le total des honoraires</div>
-          </div>
-          <div class="coeff-value" id="droitsCoeff">+0,00&nbsp;€</div>
-        </div>
-
-        <!-- TABLEAU DÉTAIL DES % -->
-        <div class="sub-label" style="margin-top:1.5rem">Détail des pourcentages appliqués</div>
-
-        <table class="droits-table">
-          <thead>
-            <tr>
-              <th>Critère</th>
-              <th>%</th>
-              <th>Justification</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="droits-group-header"><td colspan="3">Type d'utilisation</td></tr>
-            <tr>
-              <td class="td-cat">Commercial</td>
-              <td class="td-pct">+10%</td>
-              <td class="td-note">Utilisation à des fins lucratives directes (vente, promotion de produits/services)</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Éditorial</td>
-              <td class="td-pct">+8%</td>
-              <td class="td-note">Publication dans presse, magazines, livres — diffusion limitée à un titre ou support</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Logo / Identité visuelle</td>
-              <td class="td-pct">+12%</td>
-              <td class="td-note">Usage exclusif et récurrent — représente l'entreprise sur tous ses supports</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Illustration pédagogique</td>
-              <td class="td-pct">+7%</td>
-              <td class="td-note">Usage non commercial, éducatif ou associatif, diffusion restreinte</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Motifs sur supports multiples</td>
-              <td class="td-pct">+15%</td>
-              <td class="td-note">Déclinaison sur textile, packaging, merchandising — exploitation large et répétée</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Usage interne</td>
-              <td class="td-pct">+6%</td>
-              <td class="td-note">Présentation interne, intranet, usage non public — diffusion très restreinte</td>
-            </tr>
-
-            <tr class="droits-group-header"><td colspan="3">Supports de diffusion</td></tr>
-            <tr>
-              <td class="td-cat">Web / Digital</td>
-              <td class="td-pct">+5%</td>
-              <td class="td-note">Site, réseaux sociaux, newsletter — audience potentiellement large mais dématérialisée</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Print / Presse</td>
-              <td class="td-pct">+8%</td>
-              <td class="td-note">Impression papier, tirage défini — support physique implique une valorisation plus élevée</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Textile / Packaging</td>
-              <td class="td-pct">+10%</td>
-              <td class="td-note">Reproduction sur produits physiques vendus — lien direct à la valeur commerciale du produit</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Signalétique</td>
-              <td class="td-pct">+7%</td>
-              <td class="td-note">Affichage fixe (vitrine, enseigne, PLV) — durée d'exposition longue</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Publicité / Affichage</td>
-              <td class="td-pct">+9%</td>
-              <td class="td-note">Campagne publicitaire, affichage grand format — forte visibilité et impact commercial</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Tous supports</td>
-              <td class="td-pct">+12%</td>
-              <td class="td-note">Cession sans restriction de support — majoration pour l'étendue illimitée de diffusion</td>
-            </tr>
-
-            <tr class="droits-group-header"><td colspan="3">Durée de cession</td></tr>
-            <tr>
-              <td class="td-cat">1 an</td>
-              <td class="td-pct">+5%</td>
-              <td class="td-note">Cession temporaire courte — droits réversibles rapidement</td>
-            </tr>
-            <tr>
-              <td class="td-cat">3 ans</td>
-              <td class="td-pct">+10%</td>
-              <td class="td-note">Durée moyenne correspondant à un cycle de communication</td>
-            </tr>
-            <tr>
-              <td class="td-cat">5 ans</td>
-              <td class="td-pct">+15%</td>
-              <td class="td-note">Durée standard recommandée par le SNG et l'UNPI</td>
-            </tr>
-            <tr>
-              <td class="td-cat">10 ans</td>
-              <td class="td-pct">+25%</td>
-              <td class="td-note">Engagement long terme — forte immobilisation des droits</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Illimité</td>
-              <td class="td-pct">+40%</td>
-              <td class="td-note">Cession totale et définitive — équivalent d'une cession de propriété</td>
-            </tr>
-
-            <tr class="droits-group-header"><td colspan="3">Territoire</td></tr>
-            <tr>
-              <td class="td-cat">France</td>
-              <td class="td-pct">+0%</td>
-              <td class="td-note">Marché domestique — base de référence, pas de majoration</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Europe</td>
-              <td class="td-pct">+5%</td>
-              <td class="td-note">Diffusion dans l'espace européen — audience multipliée</td>
-            </tr>
-            <tr>
-              <td class="td-cat">Monde</td>
-              <td class="td-pct">+12%</td>
-              <td class="td-note">Cession mondiale sans restriction géographique — usage potentiellement universel</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- SOURCES -->
-        <div class="sources-block">
-          <strong>Sources & références</strong>
-          <ul>
-            <li>Code de la Propriété Intellectuelle — art. L.121-1, L.131-3, L.335-1 et suivants (droit moral, cession, contrefaçon)</li>
-            <li>Syndicat National des Graphistes (SNG) — guide tarifaire et bonnes pratiques professionnelles</li>
-            <li>UNPI (Union Nationale des Peintres-Illustrateurs) — barème de référence pour la cession de droits d'illustration</li>
-            <li>ADAGP (Société des auteurs dans les arts graphiques et plastiques) — grilles tarifaires pour la reproduction d'œuvres</li>
-            <li>Maison des Artistes — guide pratique du graphiste indépendant</li>
-            <li><em>Tarifer son travail de graphiste</em>, publication du collectif Libre Objet (2021)</li>
-          </ul>
-          <div class="disclaimer">
-            Ces pourcentages sont des valeurs indicatives construites à partir des pratiques professionnelles reconnues en France. Il n'existe pas de barème légal obligatoire. Chaque graphiste reste libre de les adapter selon son secteur, son positionnement et sa clientèle. En cas de doute, une consultation auprès du SNG ou d'un avocat spécialisé en droit de la propriété intellectuelle est recommandée.
-          </div>
-        </div>
-
-      </div><!-- /section 06 -->
-
-    <!-- ══ PANNEAU DEVIS ══ -->
-    <div class="quote-panel">
-      <div class="quote-card">
-        <div class="quote-header">Devis estimatif — CERISE UP</div>
-        <div class="quote-project" id="quoteProject">Description du projet…</div>
-
-        <div class="price-display">
-          <div class="price-range-label">Prix recommandé</div>
-          <div class="price-main">
-            <span id="priceMid">—</span><span class="euro">€</span>
-          </div>
-          <div class="price-range" id="priceRange">Fourchette : — à —</div>
-        </div>
-
-        <div class="breakdown">
-          <div class="breakdown-title">Détail du calcul</div>
-          <div class="breakdown-row">
-            <span class="breakdown-key">Temps (taux × heures)</span>
-            <span class="breakdown-val" id="bdTime">—</span>
-          </div>
-          <div class="breakdown-row">
-            <span class="breakdown-key">Complexité (×<span id="bdComplexMult">1.45</span>)</span>
-            <span class="breakdown-val" id="bdComplex">—</span>
-          </div>
-          <div class="breakdown-row" id="rowDeplacemement" style="display:none">
-            <span class="breakdown-key">Déplacement + temps trajet</span>
-            <span class="breakdown-val" id="bdDeplacement">—</span>
-          </div>
-          <div class="breakdown-row" id="rowReunion" style="display:none">
-            <span class="breakdown-key">Réunion de lancement</span>
-            <span class="breakdown-val" id="bdReunion">—</span>
-          </div>
-          <div class="breakdown-row" id="rowBrief" style="display:none">
-            <span class="breakdown-key">Brief & consultation</span>
-            <span class="breakdown-val" id="bdBrief">—</span>
-          </div>
-          <div class="breakdown-row" id="rowBenchmark" style="display:none">
-            <span class="breakdown-key">Benchmark / Moodboard</span>
-            <span class="breakdown-val" id="bdBenchmark">—</span>
-          </div>
-          <div class="breakdown-row" id="rowSources" style="display:none">
-            <span class="breakdown-key">Fichiers sources</span>
-            <span class="breakdown-val" id="bdSources">—</span>
-          </div>
-          <div class="breakdown-row" id="rowPng" style="display:none">
-            <span class="breakdown-key">Éléments visuels .png</span>
-            <span class="breakdown-val" id="bdPng">—</span>
-          </div>
-          <div class="breakdown-row" id="rowReseaux" style="display:none">
-            <span class="breakdown-key">Déclinaison réseaux sociaux</span>
-            <span class="breakdown-val" id="bdReseaux">—</span>
-          </div>
-          <div class="breakdown-row" id="rowComm" style="display:none">
-            <span class="breakdown-key">Communication / Identité</span>
-            <span class="breakdown-val" id="bdComm">—</span>
-          </div>
-          <div class="breakdown-row" id="rowSuivi" style="display:none">
-            <span class="breakdown-key">Suivi d'impression (10%)</span>
-            <span class="breakdown-val" id="bdSuivi">—</span>
-          </div>
-          <div class="breakdown-row" id="rowDroits" style="display:none">
-            <span class="breakdown-key">Droits d'auteur / cession</span>
-            <span class="breakdown-val" id="bdDroits">—</span>
-          </div>
-          <div class="breakdown-row">
-            <span class="breakdown-key">Urgence</span>
-            <span class="breakdown-val" id="bdUrgency">—</span>
-          </div>
-          <div class="breakdown-row total">
-            <span class="breakdown-key">Total estimé</span>
-            <span class="breakdown-val" id="bdTotal">—</span>
-          </div>
-        </div>
-
-        <div class="maintenance-badge" id="maintenanceBadge">
-          Maintenance mensuelle : <span id="maintenanceDisplay">—</span>
-        </div>
-
-        <div class="tva-mention">TVA non applicable, art. 293 B du CGI</div>
-
-        <div class="quote-actions">
-          <button class="btn-primary" id="copyBtn" onclick="copyQuote()">Copier le devis</button>
-          <button class="btn-secondary" onclick="window.print()">Imprimer / PDF</button>
-        </div>
-      </div>
-
-      <div class="tip-card">
-        <strong>Franchise en base de TVA :</strong> En micro-entreprise, aucune TVA n'est à collecter. Indiquez sur chaque facture : <em>« TVA non applicable, art. 293 B du CGI »</em>.
+      <div class="liv-inputs">
+        <input type="number" id="lBench_e" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">€</span>
+        <input type="number" id="lBench_p" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">%</span>
       </div>
     </div>
 
-  </div><!-- /main-grid -->
-</div><!-- /main-wrap -->
+    <div class="liv-item" id="lReseaux" onclick="togLiv(event,'lReseaux')">
+      <div class="liv-left">
+        <div class="chk">✓</div>
+        <div><div class="liv-name">Déclinaison réseaux sociaux</div><div class="liv-desc">Formats adaptés Instagram, LinkedIn, Facebook…</div></div>
+      </div>
+      <div class="liv-inputs">
+        <input type="number" id="lReseaux_e" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">€</span>
+        <input type="number" id="lReseaux_p" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">%</span>
+      </div>
+    </div>
 
-<!-- FOOTER -->
+    <div class="liv-item" id="lSuivi" onclick="togLiv(event,'lSuivi')">
+      <div class="liv-left">
+        <div class="chk">✓</div>
+        <div><div class="liv-name">Suivi d'impression</div><div class="liv-desc">Coordination imprimeur, BAT</div></div>
+      </div>
+      <div class="liv-inputs">
+        <input type="number" id="lSuivi_e" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">€</span>
+        <input type="number" id="lSuivi_p" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">%</span>
+      </div>
+    </div>
+
+    <div class="liv-item" id="lSources" onclick="togLiv(event,'lSources')">
+      <div class="liv-left">
+        <div class="chk">✓</div>
+        <div><div class="liv-name">Fichiers sources livrés</div><div class="liv-desc">AI, PSD, Figma, formats éditables</div></div>
+      </div>
+      <div class="liv-inputs">
+        <input type="number" id="lSources_e" min="0" placeholder="€" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">€</span>
+        <input type="number" id="lSources_p" min="0" max="100" placeholder="%" onclick="event.stopPropagation()" oninput="calc()">
+        <span class="inp-lbl">%</span>
+      </div>
+    </div>
+
+    <div class="liv-item" id="lMaint" onclick="togLiv(event,'lMaint')">
+      <div class="liv-left">
+        <div class="chk">✓</div>
+        <div><div class="liv-name">Maintenance mensuelle</div><div class="liv-desc">Mises à jour, ajustements, suivi régulier</div></div>
+      </div>
+      <div class="liv-inputs">
+        <input type="number" id="lMaint_e" min="0" placeholder="€/mois" onclick="event.stopPropagation()" oninput="syncMaint()" style="width:90px">
+        <span class="inp-lbl">€/mois</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 04 COMPLEXITÉ -->
+<div class="sec">
+  <div class="sec-lbl">04 — Complexité de la demande</div>
+  <div class="cplx-grid" style="grid-template-columns:repeat(4,1fr)">
+    <button class="cplx-btn on" onclick="setCplx(1,this)">
+      <div class="dr"><div class="d"></div><div class="d"></div></div><span>Facile<br>×1</span>
+    </button>
+    <button class="cplx-btn" onclick="setCplx(1.25,this)">
+      <div class="dr"><div class="d"></div><div class="d"></div><div class="d"></div></div><span>Moyen<br>×1.25</span>
+    </button>
+    <button class="cplx-btn" onclick="setCplx(1.5,this)">
+      <div class="dr"><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div></div><span>Complexe<br>×1.5</span>
+    </button>
+    <button class="cplx-btn" onclick="setCplx(2,this)">
+      <div class="dr"><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div></div><span>Expert<br>×2</span>
+    </button>
+  </div>
+  <div class="cplx-bar"><div class="cplx-fill" id="cBar" style="width:2%"></div></div>
+  <p class="cplx-note" id="cNote">Modificateur actuel : ×1</p>
+</div>
+
+<!-- 05 URGENCE -->
+<div class="sec">
+  <div class="sec-lbl">05 — Délai &amp; urgence</div>
+  <div class="urg-grid">
+    <button class="urg-btn" onclick="setUrg(0.9,this,'')">
+      <span class="urg-name">Flexible</span><span class="urg-mult">−10%</span>
+    </button>
+    <button class="urg-btn on" onclick="setUrg(1,this,'')">
+      <span class="urg-name">Standard</span><span class="urg-mult">×1</span>
+    </button>
+    <button class="urg-btn" onclick="setUrg(1.35,this,'c')">
+      <span class="urg-name">Urgent</span><span class="urg-mult">+35%</span>
+    </button>
+  </div>
+</div>
+
+<!-- 06 DROITS -->
+<div class="sec">
+  <div class="sec-lbl">06 — Droits d'auteur &amp; utilisation des créations</div>
+  <p class="droits-note">En droit français, la <strong style="color:var(--navy)">cession de droits d'auteur</strong> se facture séparément des honoraires (art. L.131-3 CPI). Elle est définie selon le type d'utilisation, les supports, la durée et le territoire.</p>
+
+  <div class="fld">
+    <label>Type d'utilisation</label>
+    <div class="pill-grp" id="pUsage">
+      <span class="pill" data-v="0.10" onclick="togPill(this)">Commercial +10%</span>
+      <span class="pill" data-v="0.08" onclick="togPill(this)">Éditorial +8%</span>
+      <span class="pill" data-v="0.12" onclick="togPill(this)">Logo / Identité +12%</span>
+      <span class="pill" data-v="0.07" onclick="togPill(this)">Illustration pédagogique +7%</span>
+      <span class="pill" data-v="0.15" onclick="togPill(this)">Motifs supports multiples +15%</span>
+      <span class="pill" data-v="0.06" onclick="togPill(this)">Usage interne +6%</span>
+    </div>
+  </div>
+  <div class="fld">
+    <label>Supports de diffusion</label>
+    <div class="pill-grp" id="pSupports">
+      <span class="pill" data-v="0.05" onclick="togPill(this)">Web / Digital +5%</span>
+      <span class="pill" data-v="0.08" onclick="togPill(this)">Print / Presse +8%</span>
+      <span class="pill" data-v="0.10" onclick="togPill(this)">Textile / Packaging +10%</span>
+      <span class="pill" data-v="0.07" onclick="togPill(this)">Signalétique +7%</span>
+      <span class="pill" data-v="0.09" onclick="togPill(this)">Publicité / Affichage +9%</span>
+      <span class="pill" data-v="0.12" onclick="togPill(this)">Tous supports +12%</span>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="fld" style="margin-bottom:0">
+      <label>Durée de cession</label>
+      <select id="sDuree" onchange="calc()">
+        <option value="0.05">1 an +5%</option>
+        <option value="0.10">3 ans +10%</option>
+        <option value="0.15" selected>5 ans +15%</option>
+        <option value="0.25">10 ans +25%</option>
+        <option value="0.40">Illimité +40%</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0">
+      <label>Territoire</label>
+      <select id="sTerr" onchange="calc()">
+        <option value="0.00" selected>France +0%</option>
+        <option value="0.05">Europe +5%</option>
+        <option value="0.12">Monde +12%</option>
+      </select>
+    </div>
+  </div>
+  <div class="coeff-box">
+    <div><div class="cl">Montant de cession calculé</div><div style="font-size:.63rem;color:rgba(0,31,84,.35);margin-top:2px">Appliqué sur le total honoraires</div></div>
+    <div class="cv" id="droitsAmt">+0,00 €</div>
+  </div>
+
+  <!-- TABLE DÉTAIL -->
+  <p class="sub-lbl" style="margin-top:1.4rem">Détail des pourcentages appliqués</p>
+  <table class="dtable">
+    <thead><tr><th>Critère</th><th>%</th><th>Justification</th></tr></thead>
+    <tbody>
+      <tr class="dgrp"><td colspan="3">Type d'utilisation</td></tr>
+      <tr><td class="td-c">Commercial</td><td class="td-p">+10%</td><td class="td-n">Utilisation à des fins lucratives directes</td></tr>
+      <tr><td class="td-c">Éditorial</td><td class="td-p">+8%</td><td class="td-n">Publication presse, magazines, livres</td></tr>
+      <tr><td class="td-c">Logo / Identité visuelle</td><td class="td-p">+12%</td><td class="td-n">Usage exclusif et récurrent sur tous supports</td></tr>
+      <tr><td class="td-c">Illustration pédagogique</td><td class="td-p">+7%</td><td class="td-n">Usage non commercial, éducatif ou associatif</td></tr>
+      <tr><td class="td-c">Motifs sur supports multiples</td><td class="td-p">+15%</td><td class="td-n">Déclinaison textile, packaging, merchandising</td></tr>
+      <tr><td class="td-c">Usage interne</td><td class="td-p">+6%</td><td class="td-n">Présentation interne, intranet — diffusion restreinte</td></tr>
+      <tr class="dgrp"><td colspan="3">Supports de diffusion</td></tr>
+      <tr><td class="td-c">Web / Digital</td><td class="td-p">+5%</td><td class="td-n">Site, réseaux sociaux, newsletter</td></tr>
+      <tr><td class="td-c">Print / Presse</td><td class="td-p">+8%</td><td class="td-n">Impression papier, tirage défini</td></tr>
+      <tr><td class="td-c">Textile / Packaging</td><td class="td-p">+10%</td><td class="td-n">Reproduction sur produits physiques vendus</td></tr>
+      <tr><td class="td-c">Signalétique</td><td class="td-p">+7%</td><td class="td-n">Affichage fixe — durée d'exposition longue</td></tr>
+      <tr><td class="td-c">Publicité / Affichage</td><td class="td-p">+9%</td><td class="td-n">Campagne publicitaire, fort impact commercial</td></tr>
+      <tr><td class="td-c">Tous supports</td><td class="td-p">+12%</td><td class="td-n">Cession sans restriction de support</td></tr>
+      <tr class="dgrp"><td colspan="3">Durée de cession</td></tr>
+      <tr><td class="td-c">1 an</td><td class="td-p">+5%</td><td class="td-n">Cession temporaire courte — droits réversibles</td></tr>
+      <tr><td class="td-c">3 ans</td><td class="td-p">+10%</td><td class="td-n">Durée correspondant à un cycle de communication</td></tr>
+      <tr><td class="td-c">5 ans</td><td class="td-p">+15%</td><td class="td-n">Durée standard recommandée par le SNG et l'UNPI</td></tr>
+      <tr><td class="td-c">10 ans</td><td class="td-p">+25%</td><td class="td-n">Engagement long terme — forte immobilisation des droits</td></tr>
+      <tr><td class="td-c">Illimité</td><td class="td-p">+40%</td><td class="td-n">Cession totale et définitive</td></tr>
+      <tr class="dgrp"><td colspan="3">Territoire</td></tr>
+      <tr><td class="td-c">France</td><td class="td-p">+0%</td><td class="td-n">Base de référence, pas de majoration</td></tr>
+      <tr><td class="td-c">Europe</td><td class="td-p">+5%</td><td class="td-n">Diffusion dans l'espace européen</td></tr>
+      <tr><td class="td-c">Monde</td><td class="td-p">+12%</td><td class="td-n">Cession mondiale sans restriction géographique</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sources">
+    <strong>Sources &amp; références</strong>
+    <ul>
+      <li>Code de la Propriété Intellectuelle — art. L.121-1, L.131-3, L.335-1 et suivants</li>
+      <li>Syndicat National des Graphistes (SNG) — guide tarifaire et bonnes pratiques</li>
+      <li>UNPI — barème de référence pour la cession de droits d'illustration</li>
+      <li>ADAGP — grilles tarifaires pour la reproduction d'œuvres</li>
+      <li>Maison des Artistes — guide pratique du graphiste indépendant</li>
+      <li><em>Tarifer son travail de graphiste</em>, collectif Libre Objet (2021)</li>
+    </ul>
+    <div class="disc">Ces pourcentages sont indicatifs, construits à partir des pratiques professionnelles reconnues en France. Il n'existe pas de barème légal obligatoire. En cas de doute, consultez le SNG ou un avocat spécialisé en propriété intellectuelle.</div>
+  </div>
+</div>
+
+</div><!-- /left -->
+
+<!-- RIGHT: DEVIS -->
+<div class="qpanel">
+  <div class="qcard">
+    <div class="qhdr">GraphiQuote — Devis estimatif · CERISE UP</div>
+    <div class="qproj" id="qProj">Description du projet…</div>
+
+    <div>
+      <div class="price-lbl">Prix recommandé</div>
+      <div class="price-main"><span id="pMain">—</span><span class="price-eur">€</span></div>
+      <div class="price-range" id="pRange">Fourchette : — à —</div>
+    </div>
+
+    <div class="bkd">
+      <div class="bkd-ttl">Détail du calcul</div>
+
+      <div class="bkd-row">
+        <span class="bkd-k">Temps (taux × heures)</span>
+        <span class="bkd-v" id="bdTime">—</span>
+      </div>
+      <div class="bkd-row">
+        <span class="bkd-k">Complexité (×<span id="bdCM">1</span>)</span>
+        <span class="bkd-v" id="bdCplx">—</span>
+      </div>
+      <div class="bkd-row" id="rDep" style="display:none">
+        <span class="bkd-k">Déplacement + trajet</span>
+        <span class="bkd-v" id="bdDep">—</span>
+      </div>
+      <div class="bkd-row" id="rReu" style="display:none">
+        <span class="bkd-k">Réunion de lancement</span>
+        <span class="bkd-v" id="bdReu">—</span>
+      </div>
+      <div class="bkd-row" id="rBench" style="display:none">
+        <span class="bkd-k">Benchmark / Moodboard</span>
+        <span class="bkd-v" id="bdBench">—</span>
+      </div>
+      <div class="bkd-row" id="rRes" style="display:none">
+        <span class="bkd-k">Réseaux sociaux</span>
+        <span class="bkd-v" id="bdRes">—</span>
+      </div>
+      <div class="bkd-row" id="rSuivi" style="display:none">
+        <span class="bkd-k">Suivi d'impression</span>
+        <span class="bkd-v" id="bdSuivi">—</span>
+      </div>
+      <div class="bkd-row" id="rSrc" style="display:none">
+        <span class="bkd-k">Fichiers sources</span>
+        <span class="bkd-v" id="bdSrc">—</span>
+      </div>
+      <div class="bkd-row" id="rDroits" style="display:none">
+        <span class="bkd-k">Droits d'auteur / cession</span>
+        <span class="bkd-v" id="bdDroits">—</span>
+      </div>
+      <div class="bkd-row">
+        <span class="bkd-k">Urgence</span>
+        <span class="bkd-v" id="bdUrg">—</span>
+      </div>
+      <div class="bkd-row tot">
+        <span class="bkd-k">Total estimé</span>
+        <span class="bkd-v" id="bdTot">—</span>
+      </div>
+    </div>
+
+    <div class="maint-badge" id="mBadge">Maintenance mensuelle : <span id="mDisp">—</span></div>
+    <div class="tva">TVA non applicable, art. 293 B du CGI</div>
+
+    <div class="qactions">
+      <button class="btn-p" id="copyBtn" onclick="copyQ()">Copier le devis</button>
+      <button class="btn-s" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Franchise en base de TVA :</strong> En micro-entreprise, aucune TVA à collecter. Mentionnez sur chaque facture : <em>« TVA non applicable, art. 293 B du CGI »</em>.
+  </div>
+</div><!-- /qpanel -->
+
+</div><!-- /wrap -->
+
 <footer>
-  <div class="footer-inner">
-    <div class="footer-copyright">
-      <span class="footer-brand">© EURL Lise-Marie BOURGEOIS — CERISE UP</span>
+  <div class="ft">
+    <div class="ft-copy">
+      <span class="ft-brand">© EURL Lise-Marie BOURGEOIS — CERISE UP</span>
       Copyright &copy; 2025 — Tous droits réservés.<br>
       Cet outil est la propriété exclusive de l'EURL Lise-Marie BOURGEOIS — CERISE UP.<br>
       Toute utilisation est soumise aux conditions strictes ci-contre.
     </div>
-    <div class="footer-cgu">
+    <div class="ft-cgu">
       <h3>Conditions d'utilisation strictes</h3>
       <ul>
         <li>Reproduction totale ou partielle interdite</li>
@@ -1194,281 +609,209 @@
         <li>Utilisation commerciale par des tiers interdite</li>
       </ul>
     </div>
-    <div class="footer-warning">
+    <div class="ft-warn">
       Toute violation des présentes conditions d'utilisation exposera son auteur à des poursuites judiciaires civiles et/ou pénales, conformément aux dispositions du Code de la propriété intellectuelle (art. L.335-1 et suivants) et du Code civil. L'EURL Lise-Marie BOURGEOIS — CERISE UP se réserve le droit d'engager toute action en justice afin de faire valoir ses droits et d'obtenir réparation intégrale du préjudice subi.
     </div>
   </div>
 </footer>
 
 <script>
-  let state = {
-    hourlyRate:     65,
-    hours:          8,
-    revisions:      2,
-    complexityMult: 1.45,
-    options:        0,
-    suiviImpression: false,
-    urgencyMult:    1,
-  };
+// ── STATE ──
+const S = { cplx: 1, urg: 1 };
 
-  /* ── HELPERS ── */
-  function fmt(n) {
-    return n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0€';
+// ── FORMAT ──
+function f(n) {
+  return n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0\u20ac';
+}
+
+// ── SYNC DESC ──
+function syncDesc() {
+  const v = document.getElementById('desc').value.trim();
+  document.getElementById('qProj').textContent = v || 'Description du projet\u2026';
+}
+
+// ── COMPLEXITY ──
+function setCplx(v, btn) {
+  document.querySelectorAll('.cplx-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  S.cplx = v;
+  const pct = v === 1 ? 2 : ((v - 1) / (2 - 1)) * 100;
+  document.getElementById('cBar').style.width = Math.min(100, pct) + '%';
+  document.getElementById('cNote').textContent = 'Modificateur actuel : \u00d7' + v;
+  document.getElementById('bdCM').textContent = v;
+  calc();
+}
+
+// ── URGENCY ──
+function setUrg(v, btn, t) {
+  document.querySelectorAll('.urg-btn').forEach(b => b.classList.remove('on','on-c'));
+  btn.classList.add(t === 'c' ? 'on-c' : 'on');
+  S.urg = v;
+  calc();
+}
+
+// ── TOGGLE generic ──
+function toggle(id) {
+  document.getElementById(id).classList.toggle('on');
+  calc();
+}
+
+// ── TOGGLE LIVRABLE ──
+function togLiv(e, id) {
+  document.getElementById(id).classList.toggle('on');
+  if (id === 'lMaint') syncMaint();
+  else calc();
+}
+
+// ── MAINTENANCE BADGE ──
+function syncMaint() {
+  const el  = document.getElementById('lMaint');
+  const val = parseFloat(document.getElementById('lMaint_e').value) || 0;
+  const b   = document.getElementById('mBadge');
+  const d   = document.getElementById('mDisp');
+  if (el.classList.contains('on') && val > 0) {
+    b.classList.add('show');
+    d.textContent = f(val) + '/mois';
+  } else {
+    b.classList.remove('show');
+  }
+}
+
+// ── PILLS ──
+function togPill(p) { p.classList.toggle('on'); calc(); }
+
+function droitsCoeff() {
+  let c = 0;
+  document.querySelectorAll('#pUsage .pill.on').forEach(p => c += parseFloat(p.dataset.v));
+  document.querySelectorAll('#pSupports .pill.on').forEach(p => c += parseFloat(p.dataset.v));
+  c += parseFloat(document.getElementById('sDuree').value);
+  c += parseFloat(document.getElementById('sTerr').value);
+  return c;
+}
+
+// ── LIVRABLE VALUE ──
+function livVal(id, base) {
+  const el = document.getElementById(id);
+  if (!el || !el.classList.contains('on')) return 0;
+  const eEl = document.getElementById(id + '_e');
+  const pEl = document.getElementById(id + '_p');
+  const e = eEl ? (parseFloat(eEl.value) || 0) : 0;
+  const p = pEl ? (parseFloat(pEl.value) || 0) : 0;
+  return e + (base * p / 100);
+}
+
+// ── SHOW ROW ──
+function row(rid, vid, val) {
+  const r = document.getElementById(rid);
+  const v = document.getElementById(vid);
+  if (!r || !v) return;
+  if (val > 0) { r.style.display = 'flex'; v.textContent = '+\u00a0' + f(val); }
+  else r.style.display = 'none';
+}
+
+// ── MAIN CALC ──
+function calc() {
+  const rate = parseFloat(document.getElementById('rate').value) || 70;
+  const hrs  = parseFloat(document.getElementById('hrs').value)  || 8;
+
+  // Temps × complexité
+  const tBase  = rate * hrs;
+  const tCplx  = tBase * S.cplx;
+
+  // Déplacement
+  const km   = parseFloat(document.getElementById('km').value)  || 0;
+  const kmr  = parseFloat(document.getElementById('kmr').value) || 0.42;
+  const kmh  = parseFloat(document.getElementById('kmh').value) || 0;
+  const dep  = (km * kmr) + (kmh * rate);
+
+  // Réunion
+  const reu  = document.getElementById('tReunion').classList.contains('on') ? rate : 0;
+
+  // Base honoraires
+  const base = tCplx + dep + reu;
+
+  // Livrables
+  const vBench   = livVal('lBench',   base);
+  const vReseaux = livVal('lReseaux', base);
+  const vSuivi   = livVal('lSuivi',   base);
+  const vSources = livVal('lSources', base);
+
+  const sub = base + vBench + vReseaux + vSuivi + vSources;
+
+  // Droits
+  const dc  = droitsCoeff();
+  const dv  = sub * dc;
+
+  // Total
+  const preUrg = sub + dv;
+  const total  = preUrg * S.urg;
+  const low    = total * 0.85;
+  const high   = total * 1.15;
+
+  // ── AFFICHAGE ──
+  document.getElementById('pMain').textContent =
+    total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+  document.getElementById('pRange').textContent =
+    'Fourchette\u00a0: ' + f(low) + ' \u00e0 ' + f(high);
+
+  document.getElementById('bdTime').textContent = f(tBase);
+  document.getElementById('bdCplx').textContent = f(tCplx - tBase);
+
+  row('rDep',    'bdDep',   dep);
+  row('rReu',    'bdReu',   reu);
+  row('rBench',  'bdBench', vBench);
+  row('rRes',    'bdRes',   vReseaux);
+  row('rSuivi',  'bdSuivi', vSuivi);
+  row('rSrc',    'bdSrc',   vSources);
+
+  if (dv > 0) {
+    document.getElementById('rDroits').style.display = 'flex';
+    document.getElementById('bdDroits').textContent = '+\u00a0' + f(dv);
+    document.getElementById('droitsAmt').textContent = '+\u00a0' + f(dv);
+  } else {
+    document.getElementById('rDroits').style.display = 'none';
+    document.getElementById('droitsAmt').textContent = '+0,00\u00a0\u20ac';
   }
 
-  /* ── DESCRIPTION ── */
-  function updateQuoteProject() {
-    const v = document.getElementById('projectDesc').value.trim();
-    document.getElementById('quoteProject').textContent = v || 'Description du projet…';
-  }
+  const urgDiff = total - preUrg;
+  document.getElementById('bdUrg').textContent =
+    urgDiff !== 0 ? (urgDiff > 0 ? '+\u00a0' : '\u2212\u00a0') + f(Math.abs(urgDiff)) : '\u2014';
 
-  /* ── COMPLEXITY ── */
-  function setComplexity(mult, btn) {
-    document.querySelectorAll('.complexity-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.complexityMult = mult;
-    const pct = ((mult - 1) / (2.2 - 1)) * 100;
-    document.getElementById('complexityBar').style.width = Math.min(100, Math.max(4, pct)) + '%';
-    document.getElementById('complexityLabel').textContent = `Modificateur actuel : ×${mult}`;
-    document.getElementById('bdComplexMult').textContent = mult;
-    calculate();
-  }
+  document.getElementById('bdTot').textContent = f(total);
+  syncMaint();
+}
 
-  /* ── URGENCY ── */
-  function setUrgency(mult, btn, color) {
-    document.querySelectorAll('.urgency-btn').forEach(b => b.classList.remove('active', 'active-cerise'));
-    btn.classList.add(color === 'cerise' ? 'active-cerise' : 'active');
-    state.urgencyMult = mult;
-    calculate();
-  }
+// ── COPY ──
+function copyQ() {
+  const desc = document.getElementById('desc').value.trim() || '(non précisé)';
+  const mEl  = document.getElementById('lMaint');
+  const mAmt = parseFloat(document.getElementById('lMaint_e').value) || 0;
+  const mLine = (mEl.classList.contains('on') && mAmt > 0)
+    ? '  Maintenance mensuelle : ' + f(mAmt) + '/mois' : '';
+  const lines = [
+    '\u2500\u2500\u2500 Devis CERISE UP \u2500\u2500\u2500',
+    'Projet : ' + desc, '',
+    'Prix recommandé : ' + document.getElementById('pMain').textContent + ' €',
+    document.getElementById('pRange').textContent, '',
+    'Détail :',
+    '  Temps de travail  : ' + document.getElementById('bdTime').textContent,
+    '  Complexité        : ' + document.getElementById('bdCplx').textContent,
+    '  Droits d\'auteur   : ' + (document.getElementById('bdDroits').textContent || '—'),
+    '  Urgence           : ' + document.getElementById('bdUrg').textContent,
+    '  Total estimé      : ' + document.getElementById('bdTot').textContent,
+    mLine, '',
+    'TVA non applicable, art. 293 B du CGI',
+    '© EURL Lise-Marie BOURGEOIS — CERISE UP 2025'
+  ].filter(l => l !== '');
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copié !';
+    setTimeout(() => btn.textContent = 'Copier le devis', 2200);
+  });
+}
 
-  /* ── SIMPLE OPTION TOGGLE ── */
-  function toggleOption(el, price) {
-    if (el.classList.contains('checked')) {
-      el.classList.remove('checked');
-      state.options -= price;
-    } else {
-      el.classList.add('checked');
-      state.options += price;
-    }
-    calculate();
-  }
-
-  /* ── FREE PRICE OPTION ── */
-  function toggleOptionFree(e, itemId, inputId) {
-    const el = document.getElementById(itemId);
-    el.classList.toggle('checked');
-    calculate();
-  }
-
-  /* ── SUIVI IMPRESSION (10% du total honoraires) ── */
-  function toggleSuiviImpression(el) {
-    el.classList.toggle('checked');
-    state.suiviImpression = el.classList.contains('checked');
-    calculate();
-  }
-
-  /* ── MAINTENANCE ── */
-  function toggleMaintenance(el) {
-    el.classList.toggle('checked');
-    updateMaintenanceBadge();
-  }
-
-  function updateMaintenanceBadge() {
-    const el = document.getElementById('optMaintenance');
-    const val = parseFloat(document.getElementById('inputMaintenance').value) || 0;
-    const badge = document.getElementById('maintenanceBadge');
-    const display = document.getElementById('maintenanceDisplay');
-    if (el.classList.contains('checked') && val > 0) {
-      badge.classList.add('visible');
-      display.textContent = fmt(val) + '/mois';
-    } else {
-      badge.classList.remove('visible');
-    }
-  }
-
-  /* ── TOGGLE ROW (réunion) ── */
-  function toggleCheck(id) {
-    document.getElementById(id).classList.toggle('checked');
-    calculate();
-  }
-
-  /* ── PILLS (droits) ── */
-  function togglePill(pill) {
-    pill.classList.toggle('active');
-    calculate();
-  }
-
-  function getDroitsCoeff() {
-    let coeff = 0;
-    document.querySelectorAll('#pillUsage .pill.active').forEach(p => coeff += parseFloat(p.dataset.coeff));
-    document.querySelectorAll('#pillSupports .pill.active').forEach(p => coeff += parseFloat(p.dataset.coeff));
-    coeff += parseFloat(document.getElementById('cessionDuree').value);
-    coeff += parseFloat(document.getElementById('cessionTerritoire').value);
-    return coeff;
-  }
-
-  /* ── MAIN CALCULATE ── */
-  function calculate() {
-    state.hourlyRate   = parseFloat(document.getElementById('hourlyRate').value) || 65;
-    state.hours        = parseFloat(document.getElementById('hours').value)      || 8;
-    state.revisions    = parseInt(document.getElementById('revisions').value)    || 2;
-
-    // Temps de base
-    const timeBase     = state.hourlyRate * state.hours;
-    const afterComplex = timeBase * state.complexityMult;
-
-    // Déplacement
-    const km           = parseFloat(document.getElementById('kmDistance').value) || 0;
-    const kmRate       = parseFloat(document.getElementById('kmRate').value)      || 0.42;
-    const travelH      = parseFloat(document.getElementById('travelHours').value) || 0;
-    const deplacement  = (km * kmRate) + (travelH * state.hourlyRate);
-
-    // Réunion
-    const reunionOn    = document.getElementById('toggleReunion').classList.contains('checked');
-    const reunion      = reunionOn ? state.hourlyRate * 1 : 0;
-
-    // Options fixes
-    let optionsTotal   = state.options;
-
-    // Fichiers sources (prix libre)
-    if (document.getElementById('optSources').classList.contains('checked')) {
-      optionsTotal += parseFloat(document.getElementById('inputSources').value) || 0;
-    }
-
-    // Sous-total avant impression
-    let subtotal = afterComplex + deplacement + reunion + optionsTotal;
-
-    // Suivi impression : 10% du subtotal
-    let suiviVal = 0;
-    if (state.suiviImpression) {
-      suiviVal = subtotal * 0.10;
-      document.getElementById('priceSuivi').textContent = '+' + fmt(suiviVal);
-    } else {
-      document.getElementById('priceSuivi').textContent = '10% du total';
-    }
-    subtotal += suiviVal;
-
-    // Droits d'auteur
-    const droitsCoeff  = getDroitsCoeff();
-    const droitsAmount = subtotal * droitsCoeff;
-
-    // Total avant urgence
-    const withDroits   = subtotal + droitsAmount;
-    const total        = withDroits * state.urgencyMult;
-    const low          = total * 0.85;
-    const high         = total * 1.15;
-
-    /* ── AFFICHAGE PRIX ── */
-    document.getElementById('priceMid').textContent =
-      total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
-    document.getElementById('priceRange').textContent =
-      `Fourchette\u00a0: ${fmt(low)} à ${fmt(high)}`;
-
-    /* ── DÉTAIL ── */
-    document.getElementById('bdTime').textContent    = fmt(timeBase);
-    document.getElementById('bdComplex').textContent = fmt(afterComplex - timeBase);
-
-    // Déplacement row
-    if (deplacement > 0) {
-      document.getElementById('rowDeplacemement').style.display = 'flex';
-      document.getElementById('bdDeplacement').textContent = fmt(deplacement);
-    } else {
-      document.getElementById('rowDeplacemement').style.display = 'none';
-    }
-
-    // Réunion row
-    if (reunion > 0) {
-      document.getElementById('rowReunion').style.display = 'flex';
-      document.getElementById('bdReunion').textContent = fmt(reunion);
-    } else {
-      document.getElementById('rowReunion').style.display = 'none';
-    }
-
-    // Détail options individuelles
-    function showRow(rowId, valId, val) {
-      if (val > 0) {
-        document.getElementById(rowId).style.display = 'flex';
-        document.getElementById(valId).textContent = '+\u00a0' + fmt(val);
-      } else {
-        document.getElementById(rowId).style.display = 'none';
-      }
-    }
-
-    const briefOn     = document.querySelectorAll('.option-list .option-item')[0].classList.contains('checked');
-    const benchOn     = document.querySelectorAll('.option-list .option-item')[1].classList.contains('checked');
-    const sourcesOn   = document.getElementById('optSources').classList.contains('checked');
-    const pngOn       = document.querySelectorAll('.option-list .option-item')[3].classList.contains('checked');
-    const reseauxOn   = document.querySelectorAll('.option-list .option-item')[4].classList.contains('checked');
-    const commOn      = document.querySelectorAll('.option-list .option-item')[5].classList.contains('checked');
-
-    const sourcesVal  = sourcesOn ? (parseFloat(document.getElementById('inputSources').value) || 0) : 0;
-
-    showRow('rowBrief',    'bdBrief',    briefOn   ? 150 : 0);
-    showRow('rowBenchmark','bdBenchmark',benchOn   ? 180 : 0);
-    showRow('rowSources',  'bdSources',  sourcesVal);
-    showRow('rowPng',      'bdPng',      pngOn     ? 120 : 0);
-    showRow('rowReseaux',  'bdReseaux',  reseauxOn ? 90  : 0);
-    showRow('rowComm',     'bdComm',     commOn    ? 110 : 0);
-    showRow('rowSuivi',    'bdSuivi',    suiviVal);
-
-    // Droits row
-    if (droitsAmount > 0) {
-      document.getElementById('rowDroits').style.display = 'flex';
-      document.getElementById('bdDroits').textContent = '+\u00a0' + fmt(droitsAmount);
-      document.getElementById('droitsCoeff').textContent = '+\u00a0' + fmt(droitsAmount);
-    } else {
-      document.getElementById('rowDroits').style.display = 'none';
-      document.getElementById('droitsCoeff').textContent = '+0,00\u00a0€';
-    }
-
-    const urgDiff = total - withDroits;
-    document.getElementById('bdUrgency').textContent =
-      urgDiff !== 0
-        ? (urgDiff > 0 ? '+\u00a0' : '−\u00a0') + fmt(Math.abs(urgDiff))
-        : '—';
-
-    document.getElementById('bdTotal').textContent = fmt(total);
-
-    updateMaintenanceBadge();
-  }
-
-  /* ── COPY ── */
-  function copyQuote() {
-    const desc  = document.getElementById('projectDesc').value.trim() || '(non précisé)';
-    const maint = parseFloat(document.getElementById('inputMaintenance').value) || 0;
-    const maintLine = (document.getElementById('optMaintenance').classList.contains('checked') && maint > 0)
-      ? `\n  Maintenance mensuelle : ${fmt(maint)}/mois` : '';
-
-    const lines = [
-      '─── Devis CERISE UP ───',
-      `Projet : ${desc}`,
-      '',
-      `Prix recommandé : ${document.getElementById('priceMid').textContent} €`,
-      document.getElementById('priceRange').textContent,
-      '',
-      'Détail :',
-      `  Temps de travail        : ${document.getElementById('bdTime').textContent}`,
-      `  Complexité              : ${document.getElementById('bdComplex').textContent}`,
-      `  Options & prestations   : ${document.getElementById('bdOptions').textContent}`,
-      `  Droits d\'auteur / cession : ${document.getElementById('bdDroits') ? document.getElementById('bdDroits').textContent : '—'}`,
-      `  Urgence                 : ${document.getElementById('bdUrgency').textContent}`,
-      `  Total estimé            : ${document.getElementById('bdTotal').textContent}`,
-      maintLine,
-      '',
-      'TVA non applicable, art. 293 B du CGI',
-      '© EURL Lise-Marie BOURGEOIS — CERISE UP 2025 — Tous droits réservés',
-    ].filter(l => l !== '');
-
-    navigator.clipboard.writeText(lines.join('\n')).then(() => {
-      const btn = document.getElementById('copyBtn');
-      btn.textContent = 'Copié !';
-      setTimeout(() => btn.textContent = 'Copier le devis', 2200);
-    });
-  }
-
-  /* ── INIT ── */
-  calculate();
+// ── INIT ──
+calc();
 </script>
 </body>
 </html>
